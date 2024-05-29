@@ -1,0 +1,15 @@
+services:
+    server:
+        container_name: server
+        build:
+            context: .
+            dockerfile: ./.docker/dev/Dockerfile
+        ports:
+            - 8080:8080
+        volumes:
+            - .:/app
+        environment:
+            - TERM=xterm-256color
+            - DEBUG=1
+        stdin_open: true
+        tty: true
