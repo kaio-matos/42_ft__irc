@@ -1,5 +1,6 @@
 #ifndef SOCKET_H
 #define SOCKET_H
+#include "Log.hpp"
 #include <ft_irc.hpp>
 
 template <typename T> class Socket {
@@ -152,7 +153,7 @@ public:
     _sockets.push_back(peer_socket);
   }
 
-  void poll(std::string (*onRequest)(std::string)) {
+  void poll(std::string (*onRequest)(std::string), std::string eof) {
     int num_fds = _sockets.size();
     struct pollfd poll_fds[num_fds];
     int timeout = (5 * 60 * 1000); // 5 minutes (in milliseconds)
@@ -177,7 +178,7 @@ public:
         if (poll_fds[i].revents & POLLIN) {
           accept(peer_socket);
 
-          std::string request = peer_socket.read("\r\n\r\n");
+          std::string request = peer_socket.read(eof);
           std::string response = onRequest(request);
           peer_socket.write(response);
           peer_socket.close();

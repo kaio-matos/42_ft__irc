@@ -34,7 +34,7 @@ int main() {
 
   DebugLog << "Listening on:\n" << tcp_socket;
 
-  tcp_socket.poll(onRequest);
+  tcp_socket.poll(onRequest, "\n");
 
   tcp_socket.close();
 
