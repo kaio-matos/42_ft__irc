@@ -5,6 +5,13 @@ void ctrl_c_handler(int s) {
   exit(1);
 }
 
+void sigpipe_handler(int s) {
+  // TODO: handle with broken pipes (if the client connection is closed
+  // unexpectedly)
+  DebugLog << "Broken pipe";
+  exit(1);
+}
+
 std::string USER(std::vector<std::string> args) {
   if (args.size() != 2) {
     return "usage: USER username nickname\n";
@@ -67,6 +74,7 @@ int main() {
            << "-------------------------- Starting ft_irc "
               "--------------------------";
   signal(SIGINT, ctrl_c_handler);
+  signal(SIGPIPE, sigpipe_handler);
   // signal(SIGABRT, ctrl_c_handler);
   Socket<struct sockaddr_in> tcp_socket(AF_INET, SOCK_STREAM, 0);
   struct sockaddr_in addr;
