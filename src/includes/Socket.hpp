@@ -126,6 +126,10 @@ public:
   }
 
   void accept(Socket &peer_socket) {
+    if (peer_socket._addr != NULL) {
+      return;
+    }
+
     if (!_isListener) {
       throw std::runtime_error(
           "Socket is trying to accept messages without setting listener flag");
@@ -155,11 +159,11 @@ public:
 
   void poll(std::string (*onRequest)(std::string, Socket<T> &),
             std::string eof) {
-    int num_fds = _sockets.size();
-    struct pollfd poll_fds[num_fds];
-    int timeout = (5 * 60 * 1000); // 5 minutes (in milliseconds)
-
     while (1) {
+      int num_fds = _sockets.size();
+      struct pollfd poll_fds[num_fds];
+      int timeout = (5 * 60 * 1000); // 5 minutes (in milliseconds)
+
       for (int i = 0; i < num_fds; i++) {
         poll_fds[i].fd = _sockets[i].getFd();
         poll_fds[i].events = POLLIN;
@@ -184,7 +188,6 @@ public:
           // TODO: check revents before writing to the socket to avoid blocking
           // IO issues
           peer_socket.write(response);
-          peer_socket.close();
         }
       }
     }
