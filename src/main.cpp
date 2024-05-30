@@ -69,6 +69,17 @@ std::string onRequest(std::string request, Socket<T> &from_socket) {
   return "Error: command not found\n";
 }
 
+template <typename T> void sendResponse(Socket<T> &to_socket) {
+  int i = 0;
+  int j = 0;
+  while (i < 10) {
+    to_socket.write("[NOTIFICATION] This message is number: " + SSTR(i + 1) +
+                    "\n");
+    sleep(2);
+    i++;
+  }
+}
+
 int main() {
   DebugLog << BOLDCYAN
            << "-------------------------- Starting ft_irc "
@@ -88,7 +99,7 @@ int main() {
 
   DebugLog << "Listening on:\n" << tcp_socket;
 
-  tcp_socket.poll(onRequest, "\n");
+  tcp_socket.poll(onRequest, sendResponse, "\n");
 
   tcp_socket.close();
 

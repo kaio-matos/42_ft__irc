@@ -158,7 +158,7 @@ public:
   }
 
   void poll(std::string (*onRequest)(std::string, Socket<T> &),
-            std::string eof) {
+            void (*sendResponse)(Socket<T> &), std::string eof) {
     while (1) {
       int num_fds = _sockets.size();
       struct pollfd poll_fds[num_fds];
@@ -166,7 +166,7 @@ public:
 
       for (int i = 0; i < num_fds; i++) {
         poll_fds[i].fd = _sockets[i].getFd();
-        poll_fds[i].events = POLLIN;
+        poll_fds[i].events = POLLIN | POLLOUT;
       }
 
       int ret = ::poll(poll_fds, num_fds, timeout);
@@ -179,6 +179,11 @@ public:
 
       for (int i = 0; i < num_fds; i++) {
         Socket<struct sockaddr_in> peer_socket = _sockets[i];
+
+        if (poll_fds[i].revents & POLLOUT) {
+          accept(peer_socket);
+          sendResponse(peer_socket);
+        }
 
         if (poll_fds[i].revents & POLLIN) {
           accept(peer_socket);
