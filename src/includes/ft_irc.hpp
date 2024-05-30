@@ -64,5 +64,6 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 #include <Log.hpp>
 
 #include <Socket.hpp>
+#include <User.hpp>
 
 #endif

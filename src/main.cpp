@@ -5,6 +5,12 @@ void ctrl_c_handler(int s) {
   exit(1);
 }
 
+std::string USER(std::vector<std::string> args) {
+  User createdUser(args[0], args[1]);
+
+  return "User identified successfully as " + createdUser.nickname + " (" +
+         createdUser.username + ")";
+}
 std::string KICK(std::vector<std::string> args) {
   std::string name = args[0];
 
@@ -22,17 +28,17 @@ std::string MODE(std::vector<std::string> args) { return "response from mode"; }
 
 std::string onRequest(std::string request) {
   DebugLog << "---------------------------------------------";
-  DebugLog << "Reading peer socket";
   DebugLog << request;
-
-  DebugLog << "---------------------";
-  DebugLog << "Handling command";
 
   request.erase(std::remove(request.begin(), request.end(), '\n'),
                 request.end());
   std::vector<std::string> args = split(request);
   std::string command = args[0];
   args.erase(args.begin());
+
+  if (command == "USER") {
+    return USER(args);
+  }
 
   if (command == "KICK")
     return KICK(args);
