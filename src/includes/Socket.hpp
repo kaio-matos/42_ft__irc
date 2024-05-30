@@ -153,7 +153,8 @@ public:
     _sockets.push_back(peer_socket);
   }
 
-  void poll(std::string (*onRequest)(std::string), std::string eof) {
+  void poll(std::string (*onRequest)(std::string, Socket<T> &),
+            std::string eof) {
     int num_fds = _sockets.size();
     struct pollfd poll_fds[num_fds];
     int timeout = (5 * 60 * 1000); // 5 minutes (in milliseconds)
@@ -179,7 +180,9 @@ public:
           accept(peer_socket);
 
           std::string request = peer_socket.read(eof);
-          std::string response = onRequest(request);
+          std::string response = onRequest(request, peer_socket);
+          // TODO: check revents before writing to the socket to avoid blocking
+          // IO issues
           peer_socket.write(response);
           peer_socket.close();
         }

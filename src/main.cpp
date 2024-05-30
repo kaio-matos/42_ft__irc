@@ -26,7 +26,8 @@ std::string TOPIC(std::vector<std::string> args) {
 }
 std::string MODE(std::vector<std::string> args) { return "response from mode"; }
 
-std::string onRequest(std::string request) {
+template <typename T>
+std::string onRequest(std::string request, Socket<T> &from_socket) {
   DebugLog << "---------------------------------------------";
   DebugLog << request;
 
