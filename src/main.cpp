@@ -6,6 +6,10 @@ void ctrl_c_handler(int s) {
 }
 
 std::string USER(std::vector<std::string> args) {
+  if (args.size() != 2) {
+    return "usage: USER username nickname\n";
+  }
+
   User createdUser(args[0], args[1]);
 
   return "User identified successfully as " + createdUser.nickname + " (" +
