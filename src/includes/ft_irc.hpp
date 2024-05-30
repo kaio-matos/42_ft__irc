@@ -38,6 +38,8 @@ std::string readFile(std::string filename, char separator);
 std::string replaceAll(std::string str, const std::string &from,
                        const std::string &to);
 
+std::vector<std::string> split(std::string str);
+
 template <typename T> class Socket;
 std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 

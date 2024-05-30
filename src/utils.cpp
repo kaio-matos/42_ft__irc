@@ -96,3 +96,19 @@ std::string replaceAll(std::string str, const std::string &from,
   }
   return str;
 }
+
+std::vector<std::string> split(std::string str) {
+  std::vector<std::string> splitted;
+  std::string del = " ";
+  size_t pos = str.find(del);
+
+  std::string token;
+  while (pos != std::string::npos) {
+    token = str.substr(0, pos);
+    splitted.push_back(token);
+    str.erase(0, pos + del.length());
+    pos = str.find(del);
+  }
+  splitted.push_back(str);
+  return splitted;
+}

@@ -5,15 +5,49 @@ void ctrl_c_handler(int s) {
   exit(1);
 }
 
+std::string KICK(std::vector<std::string> args) {
+  std::string name = args[0];
+
+  std::string response = std::string("Kicking: ");
+
+  return response + name;
+}
+std::string INVITE(std::vector<std::string> args) {
+  return "response from invite";
+}
+std::string TOPIC(std::vector<std::string> args) {
+  return "response from topic";
+}
+std::string MODE(std::vector<std::string> args) { return "response from mode"; }
+
 std::string onRequest(std::string request) {
   DebugLog << "---------------------------------------------";
   DebugLog << "Reading peer socket";
   DebugLog << request;
 
-  std::string response = "response";
+  DebugLog << "---------------------";
+  DebugLog << "Handling command";
+
+  request.erase(std::remove(request.begin(), request.end(), '\n'),
+                request.end());
+  std::vector<std::string> args = split(request);
+  std::string command = args[0];
+  args.erase(args.begin());
+
+  if (command == "KICK")
+    return KICK(args);
+
+  if (command == "INVITE")
+    return INVITE(args);
+
+  if (command == "TOPIC")
+    return TOPIC(args);
+
+  if (command == "MODE")
+    return MODE(args);
 
   DebugLog << "---------------------------------------------";
-  return response;
+  return "Error: command not found\n";
 }
 
 int main() {
