@@ -1,6 +1,5 @@
 #ifndef SOCKET_H
 #define SOCKET_H
-#include "Log.hpp"
 #include <ft_irc.hpp>
 
 template <typename T> class Socket {

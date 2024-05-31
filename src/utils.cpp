@@ -49,6 +49,37 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value) {
   return os;
 }
 
+std::ostream &operator<<(std::ostream &os, const User &value) {
+  os << "User {\n"
+     << "\tUsername: " << value.username << "\n"
+     << "\tNickname: " << value.nickname << "\n"
+     << "}\n";
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const Client<sockaddr_in> &value) {
+  os << "Client {\n"
+     << "\t" << value.user << "\n"
+     << "\t" << value.socket << "\n"
+     << "}\n";
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value) {
+  std::vector<Client<sockaddr_in> >::const_iterator it = value.clients.begin();
+
+  os << "Channel {\n"
+     << "\tTopic: " << value.topic << "\n"
+     << "\tClients: ";
+
+  for (; it != value.clients.end(); it++) {
+    os << *it << ", ";
+  }
+  os << "\t]\n";
+  os << "}\n";
+  return os;
+}
+
 std::string readFile(std::string filename, char separator) {
   std::ifstream file(filename.c_str());
 

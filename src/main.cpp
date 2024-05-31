@@ -12,12 +12,15 @@ void sigpipe_handler(int s) {
   exit(1);
 }
 
-std::string USER(std::vector<std::string> args) {
+template <typename T>
+std::string USER(std::vector<std::string> args, Socket<T> &from_socket) {
   if (args.size() != 2) {
     return "usage: USER username nickname\n";
   }
 
   User createdUser(args[0], args[1]);
+  Client<T> createdClient(createdUser, from_socket);
+  DebugLog << createdClient;
 
   return "User identified successfully as " + createdUser.nickname + " (" +
          createdUser.username + ")\n";
@@ -51,7 +54,7 @@ std::string onRequest(std::string request, Socket<T> &from_socket) {
   args.erase(args.begin());
 
   if (command == "USER")
-    return USER(args);
+    return USER(args, from_socket);
 
   if (command == "KICK")
     return KICK(args);

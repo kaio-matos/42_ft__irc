@@ -13,4 +13,6 @@ public:
   std::string username;
 };
 
+std::ostream &operator<<(std::ostream &os, const User &value);
+
 #endif
