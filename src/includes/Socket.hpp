@@ -14,6 +14,7 @@ public:
     _isOpen = false;
     _isListener = false;
     _isClosed = false;
+    _isWritable = false;
     _isClient = true;
     _isServer = false;
   }
@@ -28,12 +29,14 @@ public:
     _isOpen = false;
     _isListener = false;
     _isClosed = false;
+    _isWritable = false;
     _isClient = false;
     _isServer = true;
 
     _setSocketAsReusable(_fd);
     _setSocketAsNonBlocking(_fd);
-    _sockets.push_back(*this);
+
+    _sockets.push_back(this);
   }
 
   Socket(const Socket &value) { *this = value; }
@@ -44,6 +47,8 @@ public:
     _protocol = value._protocol;
     _fd = value._fd;
     _addr = NULL;
+    _pendingMessagesToWrite =
+        std::queue<std::string>(value._pendingMessagesToWrite);
     if (value._addr != NULL) {
       _allocateAddr();
       memcpy(_addr, &value._addr, sizeof(value._addr));
@@ -52,6 +57,7 @@ public:
     _isOpen = value._isOpen;
     _isListener = value._isListener;
     _isClosed = value._isClosed;
+    _isWritable = value._isWritable;
     _isClient = value._isClient;
     _isServer = value._isServer;
     return *this;
@@ -64,6 +70,15 @@ public:
     // close();
     delete _addr;
     _addr = NULL;
+  }
+
+  bool operator==(const Socket &value) const {
+    return _domain == value._domain && _type == value._type &&
+           _protocol == value._protocol && _fd == value._fd &&
+           _addr == value._addr && _isOpen == value._isOpen &&
+           _isListener == value._isListener &&
+           _isWritable == value._isWritable && _isClosed == value._isClosed &&
+           _isClient == value._isClient && _isServer == value._isServer;
   }
 
   // void bind(const struct sockaddr addr);
@@ -103,7 +118,13 @@ public:
     return result;
   }
 
-  void write(std::string str) { ::write(_fd, str.c_str(), str.size()); }
+  void write(std::string str) {
+    if (!_isWritable) {
+      _pendingMessagesToWrite.push(str);
+      return;
+    }
+    ::write(_fd, str.c_str(), str.size());
+  }
 
   void close(void) {
     if (_fd != -1) {
@@ -124,8 +145,8 @@ public:
     _isListener = true;
   }
 
-  void accept(Socket &peer_socket) {
-    if (peer_socket._addr != NULL) {
+  void accept(Socket *peer_socket) {
+    if (peer_socket->_addr != NULL) {
       return;
     }
 
@@ -138,10 +159,10 @@ public:
           "Error: trying to accept on a non server socket");
     }
 
-    peer_socket._allocateAddr();
-    unsigned int peer_addr_size = sizeof(*peer_socket._addr);
+    peer_socket->_allocateAddr();
+    unsigned int peer_addr_size = sizeof(*peer_socket->_addr);
 
-    int cfd = ::accept(_fd, reinterpret_cast<sockaddr *>(peer_socket._addr),
+    int cfd = ::accept(_fd, reinterpret_cast<sockaddr *>(peer_socket->_addr),
                        &peer_addr_size);
     if (cfd == -1) {
       throw std::runtime_error("Error while trying to accept a request ");
@@ -152,7 +173,7 @@ public:
     //
     // _setSocketAsReusable(cfd);
     // _setSocketAsNonBlocking(cfd);
-    peer_socket._fd = cfd;
+    peer_socket->_fd = cfd;
     _sockets.push_back(peer_socket);
   }
 
@@ -164,7 +185,7 @@ public:
       int timeout = (5 * 60 * 1000); // 5 minutes (in milliseconds)
 
       for (int i = 0; i < num_fds; i++) {
-        poll_fds[i].fd = _sockets[i].getFd();
+        poll_fds[i].fd = _sockets[i]->getFd();
         poll_fds[i].events = POLLIN | POLLOUT;
       }
 
@@ -177,21 +198,29 @@ public:
       }
 
       for (int i = 0; i < num_fds; i++) {
-        Socket<struct sockaddr_in> peer_socket = _sockets[i];
+        Socket<struct sockaddr_in> *peer_socket;
+
+        if (*this == *_sockets[i]) {
+          peer_socket = new Socket<struct sockaddr_in>();
+        } else {
+          peer_socket = _sockets[i];
+        }
 
         if (poll_fds[i].revents & POLLOUT) {
           accept(peer_socket);
-          sendResponse(peer_socket);
+          peer_socket->_isWritable = true;
+          peer_socket->_flushPendingMessages();
+          sendResponse(*peer_socket);
+        } else {
+          peer_socket->_isWritable = false;
         }
 
         if (poll_fds[i].revents & POLLIN) {
           accept(peer_socket);
 
-          std::string request = peer_socket.read(eof);
-          std::string response = onRequest(request, peer_socket);
-          // TODO: check revents before writing to the socket to avoid blocking
-          // IO issues
-          peer_socket.write(response);
+          std::string request = peer_socket->read(eof);
+          std::string response = onRequest(request, *peer_socket);
+          peer_socket->write(response);
         }
       }
     }
@@ -201,6 +230,8 @@ public:
   bool isOpen() const { return _isOpen; }
   bool isListener() const { return _isListener; }
   bool isClosed() const { return _isClosed; }
+  bool isWritable() const { return _isWritable; }
+
   bool isClient() const { return _isClient; }
   bool isServer() const { return _isServer; }
 
@@ -208,10 +239,18 @@ public:
   int getDomain() const { return _domain; }
   int getType() const { return _type; }
   int getProtocol() const { return _protocol; }
-  T getRawAddr() const { return *_addr; }
+  std::queue<std::string> getPendingMessagesToWrite() const {
+    return _pendingMessagesToWrite;
+  }
+  T getRawAddr() const {
+    if (_addr == NULL)
+      throw std::runtime_error("Addr not available");
+    return *_addr;
+  }
 
 private:
-  static std::vector<Socket<T> > _sockets;
+  static std::vector<Socket<T> *> _sockets;
+  std::queue<std::string> _pendingMessagesToWrite;
 
   int _fd;
   int _domain;
@@ -224,6 +263,7 @@ private:
   bool _isClosed;
   bool _isClient;
   bool _isServer;
+  bool _isWritable;
 
   void _allocateAddr(void) {
     if (_addr == NULL) {
@@ -243,8 +283,15 @@ private:
       throw std::runtime_error("Error while setting socket as non-blocking");
     }
   }
+
+  void _flushPendingMessages() {
+    while (!_pendingMessagesToWrite.empty()) {
+      write(_pendingMessagesToWrite.front());
+      _pendingMessagesToWrite.pop();
+    }
+  }
 };
 template <typename T>
-std::vector<Socket<T> > Socket<T>::_sockets = std::vector<Socket<T> >();
+std::vector<Socket<T> *> Socket<T>::_sockets = std::vector<Socket<T> *>();
 
 #endif

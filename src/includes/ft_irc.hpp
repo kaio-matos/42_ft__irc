@@ -18,13 +18,15 @@
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
-#include <map>
 #include <poll.h>
 #include <sstream>
 #include <stdexcept>
 #include <stdio.h>
 
 #include <sstream>
+
+#include <map>
+#include <queue>
 #include <vector>
 
 #define SSTR(x)                                                                \
@@ -42,8 +44,6 @@ std::vector<std::string> split(std::string str);
 
 template <typename T> class Socket;
 std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
-
-class User;
 
 #define RESET "\033[0m"
 #define BLACK "\033[30m"              /* Black */

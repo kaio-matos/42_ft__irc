@@ -1,4 +1,4 @@
-#include "User.hpp"
+#include <ft_irc.hpp>
 
 User::User(std::string username, std::string nickname)
     : username(username), nickname(nickname) {}
@@ -13,5 +13,9 @@ User &User::operator=(const User &value) {
   }
   return *this;
 }
+
+bool User::operator==(const User &value) const {
+  return username == value.username && nickname == value.username;
+};
 
 User::~User(void) {}

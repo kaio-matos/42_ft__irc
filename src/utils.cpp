@@ -42,10 +42,23 @@ std::string getAddressFromSockAddrin(const struct sockaddr_in addr) {
 
 std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value) {
   os << "Socket In {\n"
-     << "\tAddress fd: " << value.getFd() << "\n"
-     << "\tPort:       " << ntohs(value.getRawAddr().sin_port) << "\n"
-     << "\tAddress:   " << getAddressFromSockAddrin(value.getRawAddr())
+     << "\tAddress fd:           " << value.getFd() << "\n";
+  try {
+    sockaddr_in addr = value.getRawAddr();
+    os << "\tPort:                 " << ntohs(addr.sin_port) << "\n";
+  } catch (const std::exception &e) {
+    os << "\tPort:                 " << "unavailable\n";
+  }
+  try {
+    sockaddr_in addr = value.getRawAddr();
+    os << "\tAddress:              " << getAddressFromSockAddrin(addr) << "\n";
+  } catch (const std::exception &e) {
+    os << "\tAddress:              " << "unavailable\n";
+  }
+  os << "\tIs Writable:          " << value.isWritable() << "\n"
+     << "\tLast Pending Message: " << value.getPendingMessagesToWrite().front()
      << "\n}";
+
   return os;
 }
 
@@ -66,14 +79,14 @@ std::ostream &operator<<(std::ostream &os, const Client<sockaddr_in> &value) {
 }
 
 std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value) {
-  std::vector<Client<sockaddr_in> >::const_iterator it = value.clients.begin();
+  std::map<int, Client<sockaddr_in> >::iterator it = value.getClients().begin();
 
   os << "Channel {\n"
      << "\tTopic: " << value.topic << "\n"
      << "\tClients: ";
 
-  for (; it != value.clients.end(); it++) {
-    os << *it << ", ";
+  for (; it != value.getClients().end(); it++) {
+    os << it->second << ", ";
   }
   os << "\t]\n";
   os << "}\n";

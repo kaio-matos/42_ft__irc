@@ -9,6 +9,8 @@ public:
   User &operator=(const User &value);
   ~User(void);
 
+  bool operator==(const User &value) const;
+
   std::string nickname;
   std::string username;
 };
