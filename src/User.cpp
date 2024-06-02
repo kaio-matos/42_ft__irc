@@ -15,7 +15,7 @@ User &User::operator=(const User &value) {
 }
 
 bool User::operator==(const User &value) const {
-  return username == value.username && nickname == value.username;
+  return username == value.username && nickname == value.nickname;
 };
 
 User::~User(void) {}

@@ -191,7 +191,7 @@ public:
 
       int ret = ::poll(poll_fds, num_fds, timeout);
       if (ret < 0) {
-        throw new std::runtime_error("poll error");
+        throw std::runtime_error("poll error");
       } else if (ret == 0) {
         DebugLog << BOLDBLUE << "Poll timed out";
         continue;
