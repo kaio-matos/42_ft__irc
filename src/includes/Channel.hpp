@@ -1,6 +1,7 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 #include <ft_irc.hpp>
+#include <stdexcept>
 
 template <typename T> class Channel {
 
@@ -26,7 +27,14 @@ public:
   };
 
   void disconnectClient(Client<T> client) {
-    _clients.erase(_clients.find(_clients.begin(), _clients.end(), client));
+    typename map::iterator it = _clients.begin();
+
+    for (it = _clients.begin(); it != _clients.end(); ++it) {
+      if (it->second == client) {
+        _clients.erase(it);
+        break;
+      }
+    }
   };
 
   void broadcast(Client<T> from, std::string message) {
@@ -46,6 +54,17 @@ public:
 
   Client<T> getClient(Socket<T> socket) const {
     return _clients.at(socket.getFd());
+  }
+
+  Client<T> getClient(std::string name) const {
+    typename map::const_iterator it = _clients.begin();
+
+    for (it; it != _clients.end(); it++) {
+      if (name == it->second.user.username) {
+        return it->second;
+      }
+    }
+    throw std::runtime_error("Client not found");
   }
 
   std::string topic;
