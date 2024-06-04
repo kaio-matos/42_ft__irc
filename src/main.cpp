@@ -1,10 +1,4 @@
-#include "IRC.hpp"
 #include <ft_irc.hpp>
-
-template <typename T> Channel<T> &GamesChannel(void) {
-  static Channel<T> *createdChannel = new Channel<T>("Games");
-  return *createdChannel;
-}
 
 void ctrl_c_handler(int s) {
   DebugLog << "Closing sockets";
@@ -16,71 +10,6 @@ void sigpipe_handler(int s) {
   // unexpectedly)
   DebugLog << "Broken pipe";
   exit(1);
-}
-
-template <typename T>
-std::string USER(std::vector<std::string> args, Socket<T> &from_socket,
-                 IRC<T> &irc) {
-  if (args.size() != 2) {
-    return "usage: USER username nickname\n";
-  }
-
-  User createdUser(args[0], args[1]);
-  Client<T> createdClient(createdUser, from_socket);
-
-  irc.addClient(createdClient);
-
-  GamesChannel<T>().connectClient(createdClient);
-
-  return "User identified successfully as " + createdUser.nickname + " (" +
-         createdUser.username + ")\n";
-}
-
-template <typename T>
-std::string KICK(std::vector<std::string> args, Socket<T> &from_socket,
-                 IRC<T> &irc) {
-  std::string name = args[0];
-
-  std::string response = std::string("Kicking: ");
-
-  return response + name + "\n";
-}
-
-template <typename T>
-std::string INVITE(std::vector<std::string> args, Socket<T> &from_socket,
-                   IRC<T> &irc) {
-  return "response from invite\b";
-}
-
-template <typename T>
-std::string TOPIC(std::vector<std::string> args, Socket<T> &from_socket,
-                  IRC<T> &irc) {
-  return "response from topic\n";
-}
-
-template <typename T>
-std::string MODE(std::vector<std::string> args, Socket<T> &from_socket,
-                 IRC<T> &irc) {
-  return "response from mode\n";
-}
-
-template <typename T>
-std::string BROADCAST(std::vector<std::string> args, Socket<T> &from_socket,
-                      IRC<T> &irc) {
-  if (args.size() != 2) {
-    return "usage: BROADCAST channel message\n";
-  }
-
-  std::string channel = args[0];
-  std::string message = args[1];
-
-  if (channel == "games") {
-    Channel<T> c = GamesChannel<T>();
-    c.broadcast(c.getClient(from_socket), message + "\n");
-    return "Message sent successfully";
-  }
-
-  return "Channel not found";
 }
 
 template <typename T>

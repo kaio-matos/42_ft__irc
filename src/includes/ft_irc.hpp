@@ -75,4 +75,26 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 
 #include <IRC.hpp>
 
+template <typename T> Channel<T> &GamesChannel(void) {
+  static Channel<T> *createdChannel = new Channel<T>("Games");
+  return *createdChannel;
+}
+
+std::string BROADCAST(std::vector<std::string> args,
+                      Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
+std::string INVITE(std::vector<std::string> args,
+                   Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
+std::string KICK(std::vector<std::string> args,
+                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
+std::string MODE(std::vector<std::string> args,
+                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
+std::string TOPIC(std::vector<std::string> args,
+                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
+std::string USER(std::vector<std::string> args,
+                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 #endif
