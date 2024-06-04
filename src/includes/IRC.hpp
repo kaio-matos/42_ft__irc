@@ -8,7 +8,7 @@ public:
   // IRC(std::map<int, Client<T> > clients,
   //     std::map<std::string, Channel<T> > channels)
   //     : clients(clients), channels(channels){};
-  IRC(const IRC &value) : clients(value._clients), channels(value.channels){};
+  IRC(const IRC &value) : clients(value.clients), channels(value.channels){};
   IRC &operator=(const IRC &value) {
     if (this != &value) {
       clients = value.clients;
