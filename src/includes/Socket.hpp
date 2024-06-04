@@ -177,8 +177,10 @@ public:
     _sockets.push_back(peer_socket);
   }
 
-  void poll(std::string (*onRequest)(std::string, Socket<T> &),
-            void (*sendResponse)(Socket<T> &), std::string eof) {
+  template <typename Arg>
+  void poll(std::string (*onRequest)(std::string, Socket<T> &, Arg &),
+            void (*sendResponse)(Socket<T> &, Arg &), Arg &argument,
+            std::string eof) {
     while (1) {
       int num_fds = _sockets.size();
       struct pollfd poll_fds[num_fds];
@@ -210,7 +212,7 @@ public:
           accept(peer_socket);
           peer_socket->_isWritable = true;
           peer_socket->_flushPendingMessages();
-          sendResponse(*peer_socket);
+          sendResponse(*peer_socket, argument);
         } else {
           peer_socket->_isWritable = false;
         }
@@ -219,7 +221,7 @@ public:
           accept(peer_socket);
 
           std::string request = peer_socket->read(eof);
-          std::string response = onRequest(request, *peer_socket);
+          std::string response = onRequest(request, *peer_socket, argument);
           peer_socket->write(response);
         }
       }

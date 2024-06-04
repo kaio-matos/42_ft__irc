@@ -29,7 +29,7 @@ public:
     _clients.erase(_clients.find(_clients.begin(), _clients.end(), client));
   };
 
-  void brodcast(Client<T> from, std::string message) {
+  void broadcast(Client<T> from, std::string message) {
     typename map::iterator it = _clients.begin();
     DebugLog << "BEGIN";
     for (it; it != _clients.end(); it++) {

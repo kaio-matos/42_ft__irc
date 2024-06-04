@@ -72,4 +72,7 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 #include <Client.hpp>
 
 #include <Channel.hpp>
+
+#include <IRC.hpp>
+
 #endif

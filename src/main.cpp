@@ -1,3 +1,4 @@
+#include "IRC.hpp"
 #include <ft_irc.hpp>
 
 template <typename T> Channel<T> &GamesChannel(void) {
@@ -18,7 +19,8 @@ void sigpipe_handler(int s) {
 }
 
 template <typename T>
-std::string USER(std::vector<std::string> args, Socket<T> &from_socket) {
+std::string USER(std::vector<std::string> args, Socket<T> &from_socket,
+                 IRC<T> &irc) {
   if (args.size() != 2) {
     return "usage: USER username nickname\n";
   }
@@ -26,30 +28,45 @@ std::string USER(std::vector<std::string> args, Socket<T> &from_socket) {
   User createdUser(args[0], args[1]);
   Client<T> createdClient(createdUser, from_socket);
 
+  irc.addClient(createdClient);
+
   GamesChannel<T>().connectClient(createdClient);
 
   return "User identified successfully as " + createdUser.nickname + " (" +
          createdUser.username + ")\n";
 }
-std::string KICK(std::vector<std::string> args) {
+
+template <typename T>
+std::string KICK(std::vector<std::string> args, Socket<T> &from_socket,
+                 IRC<T> &irc) {
   std::string name = args[0];
 
   std::string response = std::string("Kicking: ");
 
   return response + name + "\n";
 }
-std::string INVITE(std::vector<std::string> args) {
+
+template <typename T>
+std::string INVITE(std::vector<std::string> args, Socket<T> &from_socket,
+                   IRC<T> &irc) {
   return "response from invite\b";
 }
-std::string TOPIC(std::vector<std::string> args) {
 
+template <typename T>
+std::string TOPIC(std::vector<std::string> args, Socket<T> &from_socket,
+                  IRC<T> &irc) {
   return "response from topic\n";
 }
-std::string MODE(std::vector<std::string> args) {
+
+template <typename T>
+std::string MODE(std::vector<std::string> args, Socket<T> &from_socket,
+                 IRC<T> &irc) {
   return "response from mode\n";
 }
+
 template <typename T>
-std::string BROADCAST(std::vector<std::string> args, Socket<T> &from_socket) {
+std::string BROADCAST(std::vector<std::string> args, Socket<T> &from_socket,
+                      IRC<T> &irc) {
   if (args.size() != 2) {
     return "usage: BROADCAST channel message\n";
   }
@@ -59,7 +76,7 @@ std::string BROADCAST(std::vector<std::string> args, Socket<T> &from_socket) {
 
   if (channel == "games") {
     Channel<T> c = GamesChannel<T>();
-    c.brodcast(c.getClient(from_socket), message + "\n");
+    c.broadcast(c.getClient(from_socket), message + "\n");
     return "Message sent successfully";
   }
 
@@ -67,7 +84,8 @@ std::string BROADCAST(std::vector<std::string> args, Socket<T> &from_socket) {
 }
 
 template <typename T>
-std::string onRequest(std::string request, Socket<T> &from_socket) {
+std::string onRequest(std::string request, Socket<T> &from_socket,
+                      IRC<T> &irc) {
   DebugLog << "---------------------------------------------";
   DebugLog << request;
 
@@ -78,28 +96,28 @@ std::string onRequest(std::string request, Socket<T> &from_socket) {
   args.erase(args.begin());
 
   if (command == "USER")
-    return USER(args, from_socket);
+    return USER(args, from_socket, irc);
 
   if (command == "KICK")
-    return KICK(args);
+    return KICK(args, from_socket, irc);
 
   if (command == "INVITE")
-    return INVITE(args);
+    return INVITE(args, from_socket, irc);
 
   if (command == "TOPIC")
-    return TOPIC(args);
+    return TOPIC(args, from_socket, irc);
 
   if (command == "MODE")
-    return MODE(args);
+    return MODE(args, from_socket, irc);
 
   if (command == "BROADCAST")
-    return BROADCAST(args, from_socket);
+    return BROADCAST(args, from_socket, irc);
 
   DebugLog << "---------------------------------------------";
   return "Error: command not found\n";
 }
 
-template <typename T> void sendResponse(Socket<T> &to_socket) {}
+template <typename T> void sendResponse(Socket<T> &to_socket, IRC<T> &irc) {}
 
 int main() {
   DebugLog << BOLDCYAN
@@ -119,8 +137,9 @@ int main() {
   tcp_socket.listen(5);
 
   DebugLog << "Listening on:\n" << tcp_socket;
+  IRC<sockaddr_in> irc;
 
-  tcp_socket.poll(onRequest, sendResponse, "\n");
+  tcp_socket.poll(onRequest, sendResponse, irc, "\n");
 
   tcp_socket.close();
 
