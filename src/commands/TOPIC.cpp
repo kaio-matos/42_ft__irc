@@ -8,11 +8,12 @@ std::string TOPIC(std::vector<std::string> args,
 		return 1;//retorna erro
 	
 	//caso der certo obter dados do cliente que enviou comando
-	std::string clientuser = irc.clients.user;
+	std::string clientuser = irc.clients.user.username;
+	std::string clientuser = irc.clients.user.nickname;
 
 	//obter dados do canal e verificar se existe
 	std::string channelname = args[0];
-	std::vector<channel>::iterator it = std::find(irc.channels.begin(),irc.channels.end(), channelname);
+	std::vector<Channel>::iterator it = std::find(irc.channels.begin(),irc.channels.end(), channelname);
 	if( it == irc.channels.end())
 		return 1;//nao achou o canal com o nome passado
 	
