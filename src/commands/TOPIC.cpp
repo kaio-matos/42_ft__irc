@@ -5,7 +5,7 @@ std::string TOPIC(std::vector<std::string> args,
 	
 	//verificar a quantidade de argumentos passados
 	if(args.size() < 1 || args.size() > 3)
-		return 1;//retorna erro
+		return "wrong args";//retorna erro
 	
 	//caso der certo obter dados do cliente que enviou comando
 	std::string clientuser = irc.clients.user.username;
