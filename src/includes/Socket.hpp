@@ -202,14 +202,21 @@ public:
       for (int i = 0; i < num_fds; i++) {
         Socket<struct sockaddr_in> *peer_socket;
 
+        bool canWrite = poll_fds[i].revents & POLLOUT;
+        bool canRead = poll_fds[i].revents & POLLIN;
+
         if (*this == *_sockets[i]) {
-          peer_socket = new Socket<struct sockaddr_in>();
+          if (canRead) {
+            peer_socket = new Socket<struct sockaddr_in>();
+            accept(peer_socket);
+          } else {
+            continue;
+          }
         } else {
           peer_socket = _sockets[i];
         }
 
-        if (poll_fds[i].revents & POLLOUT) {
-          accept(peer_socket);
+        if (canWrite) {
           peer_socket->_isWritable = true;
           peer_socket->_flushPendingMessages();
           sendResponse(*peer_socket, argument);
@@ -217,9 +224,7 @@ public:
           peer_socket->_isWritable = false;
         }
 
-        if (poll_fds[i].revents & POLLIN) {
-          accept(peer_socket);
-
+        if (canRead) {
           std::string request = peer_socket->read(eof);
           std::string response = onRequest(request, *peer_socket, argument);
           peer_socket->write(response);
