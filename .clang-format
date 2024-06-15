@@ -1,0 +1,9 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 2
+---
+Language: Cpp
+Standard: Cpp03
+DerivePointerAlignment: false
+PointerAlignment: Right
+---

@@ -1,7 +1,6 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 #include <ft_irc.hpp>
-#include <stdexcept>
 
 template <typename T> class Channel {
 
@@ -24,6 +23,8 @@ public:
     DebugLog << "Client fd: " << client.socket.getFd();
     _clients.insert(
         typename Channel::map::value_type(client.socket.getFd(), client));
+    broadcast(client,
+              "New user " + client.user.nickname + " has entered the channel");
   };
 
   void disconnectClient(Client<T> client) {
