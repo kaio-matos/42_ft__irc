@@ -30,6 +30,9 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   if (command == "KICK")
     return KICK(args, from_socket, irc);
 
+  if (command == "NICK")
+    return NICK(args, from_socket, irc);
+
   if (command == "INVITE")
     return INVITE(args, from_socket, irc);
 

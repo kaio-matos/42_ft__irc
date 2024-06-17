@@ -2,11 +2,11 @@
 
 std::string USER(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
-  if (args.size() != 2) {
-    return "usage: USER username nickname\n";
+  if (args.size() != 4) {
+    return "usage: USER <username> <hostname> <servername> <realname>\n";
   }
 
-  User createdUser(args[0], args[1]);
+  User createdUser(args[3], args[0]);
   Client<sockaddr_in> createdClient(createdUser, from_socket);
 
   irc.addClient(createdClient);
