@@ -4,9 +4,13 @@
 
 class User {
 public:
+
   User(std::string username, std::string nickname);
+
   User(const User &value);
+
   User &operator=(const User &value);
+  
   ~User(void);
 
   bool operator==(const User &value) const;

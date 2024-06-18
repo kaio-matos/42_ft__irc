@@ -7,16 +7,28 @@ template <typename T> class Channel {
 public:
   typedef std::map<int, Client<T> > map;
 
-  Channel(std::string topic) : topic(topic){};
+  Channel(std::string topic) : _topic(topic), _opTopicOnly(false), _hasPasswd(false), _userLimit(-1), _hasUserlimit(false), _isInviteOnly(false) {}
+
   Channel(const Channel &value)
-      : topic(value.topic), _clients(value._clients){};
+      : _topic(value._topic), _clients(value._clients), _operators(value._operators),
+        _opTopicOnly(value._opTopicOnly), _passwd(value._passwd), _hasPasswd(value._hasPasswd),
+        _userLimit(value._userLimit), _hasUserlimit(value._hasUserlimit), _isInviteOnly(value._isInviteOnly) {}
+
   Channel &operator=(const Channel &value) {
     if (this != &value) {
       _clients = value._clients;
-      topic = value.topic;
+      _operators = value._operators;
+      _topic = value.getTopic();
+      _opTopicOnly = value._opTopicOnly;
+      _passwd = value._passwd;
+      _hasPasswd = value._hasPasswd;
+      _userLimit = value._userLimit;
+      _hasUserlimit = value._hasUserlimit;
+      _isInviteOnly = value._isInviteOnly;
     }
     return *this;
-  };
+  }
+
   ~Channel(void){};
 
   void connectClient(Client<T> &client) {
@@ -68,10 +80,98 @@ public:
     throw std::runtime_error("Client not found");
   }
 
-  std::string topic;
+std::string getChannelUsers() const {
+  std::string userList;
+  for (size_t i = 0; i < this->getClientsize(); i++) { 
+		userList += this->_clients[i].user.username;
+		userList += " ";
+	}
+	return userList;
+}
+
+
+void addOperator(const Client<T> &client) {
+  _operators.insert(typename Channel::map::value_type(client.socket.getFd(), client));
+}
+
+void removeOperator(const Client<T> &client) {
+  _operators.erase(client.socket.getFd());
+}
+
+bool isOperator(const Client<T> &client) const {
+  return _operators.find(client.socket.getFd()) != _operators.end();
+}
+
+
+//Password methods and getters
+std::string getPasswd() const {
+	return (this->_passwd);
+}
+
+void setPasswd(bool action, const std::string &passwd) {
+	this->_hasPasswd = action;
+  if(action == false)
+    this->_passwd = "";
+  else
+	  this->_passwd = passwd;
+}
+
+//Topic methods and getters
+std::string getTopic() const {
+	return (this->_topic);
+}
+
+void setTopic(const std::string &topic) {
+	this->_topic = topic;
+}
+
+void setTopicRestricted(bool action) {
+	this->_opTopicOnly = action;
+}
+
+bool isTopicOPOnly() {
+    if (this->_opTopicOnly)
+        return false;
+    return true;
+}
+
+//User limit methods and getters
+size_t getUserLimit() const {
+	return (this->_userLimit);
+}
+
+void setUserLimit(bool action, const size_t &userLimit) {
+    this->_hasUserlimit = action;
+  if(action == false)
+    this->_userLimit = -1;
+  else
+	  this->_userLimit = userLimit;
+}
+
+//Invite only methods and getters
+bool getIsInviteOnly() const {
+	return (this->_isInviteOnly);
+}
+
+void setIsInviteOnly(bool action) {
+	this->_isInviteOnly = action;
+}
 
 private:
-  map _clients;
+
+  map         _clients;
+  map         _operators;
+
+  std::string _topic;
+  bool        _opTopicOnly;
+
+  std::string _passwd;
+  bool        _hasPasswd;
+
+  size_t      _userLimit;
+  bool        _hasUserlimit;
+
+  bool        _isInviteOnly;
 };
 
 std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value);

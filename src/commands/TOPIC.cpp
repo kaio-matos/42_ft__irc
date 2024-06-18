@@ -1,5 +1,6 @@
-#include <ft_irc.hpp>
+//#include <ft_irc.hpp>
 
+/*
 std::string TOPIC(std::vector<std::string> args,
                   Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
 	
@@ -35,10 +36,8 @@ std::string TOPIC(std::vector<std::string> args,
 	 */
 
 	//Definir o novo topico, caso virar private lembrar de trocar por getters
-	std::string newtopic = args[1];
-	irc.channels.topic = newtopic;
+	//std::string newtopic = args[1];
+	//irc.channels.topic = newtopic;
 
 	//notificar os clients do canal sobre a mudanca
-
-
-}
+//}

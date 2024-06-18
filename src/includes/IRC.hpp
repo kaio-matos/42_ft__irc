@@ -25,7 +25,7 @@ public:
 
   void addChannel(Channel<T> channel) {
     channels.insert(typename std::map<std::string, Channel<T> >::value_type(
-        channel.topic, channel));
+        channel.getTopic(), channel));
   };
 
   Client<T> *getClient(std::string nickname) {

@@ -82,7 +82,7 @@ std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value) {
   std::map<int, Client<sockaddr_in> >::iterator it = value.getClients().begin();
 
   os << "Channel {\n"
-     << "\tTopic: " << value.topic << "\n"
+     << "\tTopic: " << value.getTopic() << "\n"
      << "\tClients: ";
 
   for (; it != value.getClients().end(); it++) {
@@ -155,4 +155,15 @@ std::vector<std::string> split(std::string str) {
   }
   splitted.push_back(str);
   return splitted;
+}
+
+std::vector<std::string> splitByComma(const std::string &data) {
+  std::string token;
+  std::vector<std::string> tokens;
+  std::istringstream iss(data);
+
+  while (std::getline(iss, token, ',')) {
+    tokens.push_back(token);
+  }
+  return (tokens);
 }
