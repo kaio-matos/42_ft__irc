@@ -42,11 +42,13 @@ public:
   Client<T> *getClient(int fd) { return &clients.find(fd)->second; }
 
   Channel<T> *getChannel(std::string topic) {
-    typename std::map<int, Client<T> >::iterator it = channels.find(topic);
-    if (*it == channels.end()) {
-      return NULL;
+    typename std::map<std::string, Channel<T> >::iterator it =
+        channels.find(topic);
+
+    if (it != channels.end()) {
+      return &it->second;
     }
-    return &it->second;
+    return NULL;
   }
 
   std::map<int, Client<T> > clients;

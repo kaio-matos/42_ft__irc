@@ -8,7 +8,7 @@ std::string PRIVMSG(std::vector<std::string> args,
   }
   Client<sockaddr_in> *client = irc.getClient(from_socket.getFd());
 
-  std::string target_nickname = args[0];
+  std::string target_nickname_or_channel = args[0];
   std::string message = std::string(args[1]);
 
   message.erase(
@@ -18,10 +18,23 @@ std::string PRIVMSG(std::vector<std::string> args,
     message.append(args[i]);
   }
 
-  Client<sockaddr_in> *target = irc.getClient(target_nickname);
-  target->socket.write(":" + client->user.nickname + " PRIVMSG :" + message);
-  if (target == NULL) {
-    return "No such nick/channel\n";
+  Channel<sockaddr_in> *target_channel =
+      irc.getChannel(target_nickname_or_channel);
+  Client<sockaddr_in> *target_client =
+      irc.getClient(target_nickname_or_channel);
+
+  if (target_channel) {
+    target_channel->broadcast(*client, ":" + client->user.nickname +
+                                           " PRIVMSG " + target_channel->topic +
+                                           " :" + message);
+    return "\n";
   }
-  return "\n";
+
+  if (target_client) {
+    target_client->socket.write(":" + client->user.nickname +
+                                " PRIVMSG :" + message);
+    return "\n";
+  }
+
+  return "No such nick/channel\n";
 }
