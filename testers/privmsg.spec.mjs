@@ -13,7 +13,7 @@ const cKaio = net.createConnection(
       if (
         response.toLowerCase().includes("new user john has entered the channel")
       ) {
-        cKaio.write("KICK john games\n");
+        cKaio.write("PRIVMSG john :Hello are you receiving this message?\n");
       }
 
       console.log("User Kaio ---------------------------------\n");

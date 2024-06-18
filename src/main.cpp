@@ -45,6 +45,9 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   if (command == "BROADCAST")
     return BROADCAST(args, from_socket, irc);
 
+  if (command == "PRIVMSG")
+    return PRIVMSG(args, from_socket, irc);
+
   DebugLog << "---------------------------------------------";
   return "Error: command not found\n";
 }

@@ -28,6 +28,17 @@ public:
         channel.topic, channel));
   };
 
+  Client<T> &getClient(std::string nickname) {
+    typename std::map<int, Client<T> >::iterator it = clients.begin();
+
+    for (; it != clients.end(); it++) {
+      if (it->second.user.nickname == nickname) {
+        return it->second;
+      }
+    }
+    throw std::runtime_error("Client not found");
+  }
+
   std::map<int, Client<T> > clients;
   std::map<std::string, Channel<T> > channels;
 };
