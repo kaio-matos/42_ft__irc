@@ -7,9 +7,8 @@ std::string NICK(std::vector<std::string> args,
   }
   std::string name = args[0];
 
-  std::map<int, Client<sockaddr_in> >::iterator clientIt =
-      irc.clients.find(from_socket.getFd());
-  clientIt->second.user.nickname = name;
+  Client<sockaddr_in> *client = irc.getClient(from_socket.getFd());
+  client->user.nickname = name;
 
   return "Nickname updated successfully to " + name + "\n";
 }
