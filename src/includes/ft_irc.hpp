@@ -94,8 +94,8 @@ std::string KICK(std::vector<std::string> args,
 std::string MODE(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
-std::string TOPIC(std::vector<std::string> args,
-                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+//std::string TOPIC(std::vector<std::string> args,
+ //                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
 std::string USER(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);

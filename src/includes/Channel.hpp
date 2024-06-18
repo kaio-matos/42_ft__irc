@@ -81,12 +81,14 @@ public:
   }
 
 std::string getChannelUsers() const {
-  std::string userList;
-  for (size_t i = 0; i < this->getClientsize(); i++) { 
-		userList += this->_clients[i].user.username;
-		userList += " ";
-	}
-	return userList;
+    std::string userList;
+    for (typename map::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        userList += it->second.user.nickname + " ";
+    }
+    if (!userList.empty()) {
+        userList.resize(userList.size() - 1); // Remove o último caractere (espaço em branco)
+    }
+    return userList;
 }
 
 
