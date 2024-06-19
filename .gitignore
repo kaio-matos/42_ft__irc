@@ -3,3 +3,4 @@ ft_irc
 *.o
 compile_commands.json
 .cache/*/**
+.vscode

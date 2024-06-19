@@ -36,9 +36,10 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   if (command == "INVITE")
     return INVITE(args, from_socket, irc);
 
-  if (command == "TOPIC")
-    return TOPIC(args, from_socket, irc);
-
+  //if (command == "TOPIC")
+  //  return TOPIC(args, from_socket, irc);
+  if(command == "JOIN")
+    return JOIN(args, from_socket, irc);
   if (command == "MODE")
     return MODE(args, from_socket, irc);
 

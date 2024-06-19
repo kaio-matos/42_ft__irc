@@ -4,8 +4,11 @@
 
 template <typename T> class Client {
 public:
+
   Client(User user, Socket<T> &socket) : user(user), socket(socket){};
+
   Client(const Client &value) : user(value.user), socket(value.socket){};
+
   Client &operator=(const Client &value) {
     if (this != &value) {
       user = value.user;
@@ -13,6 +16,7 @@ public:
     }
     return *this;
   };
+  
   ~Client(void){};
 
   bool operator==(const Client &value) const {

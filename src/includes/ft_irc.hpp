@@ -20,10 +20,9 @@
 #include <iostream>
 #include <poll.h>
 #include <sstream>
+#include <string>
 #include <stdexcept>
 #include <stdio.h>
-
-#include <sstream>
 
 #include <map>
 #include <queue>
@@ -41,6 +40,7 @@ std::string replaceAll(std::string str, const std::string &from,
                        const std::string &to);
 
 std::vector<std::string> split(std::string str);
+std::vector<std::string> splitByComma(const std::string &data);
 
 template <typename T> class Socket;
 std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
@@ -75,6 +75,8 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 
 #include <IRC.hpp>
 
+#include <replies.hpp>
+
 template <typename T> Channel<T> &GamesChannel(void) {
   static Channel<T> *createdChannel = new Channel<T>("Games");
   return *createdChannel;
@@ -92,8 +94,8 @@ std::string KICK(std::vector<std::string> args,
 std::string MODE(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
-std::string TOPIC(std::vector<std::string> args,
-                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+//std::string TOPIC(std::vector<std::string> args,
+ //                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
 std::string USER(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
@@ -104,4 +106,6 @@ std::string NICK(std::vector<std::string> args,
 std::string PRIVMSG(std::vector<std::string> args,
                     Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
+std::string JOIN(std::vector<std::string> args,
+                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 #endif
