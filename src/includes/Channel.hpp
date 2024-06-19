@@ -80,7 +80,7 @@ public:
     throw std::runtime_error("Client not found");
   }
 
-std::string getChannelUsers() const {
+  std::string getChannelUsers() const {
     std::string userList;
     for (typename map::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
         userList += it->second.user.nickname + " ";
@@ -89,75 +89,75 @@ std::string getChannelUsers() const {
         userList.resize(userList.size() - 1); // Remove o último caractere (espaço em branco)
     }
     return userList;
-}
+  }
 
 
-void addOperator(const Client<T> &client) {
-  _operators.insert(typename Channel::map::value_type(client.socket.getFd(), client));
-}
+  void addOperator(const Client<T> &client) {
+    _operators.insert(typename Channel::map::value_type(client.socket.getFd(), client));
+  }
 
-void removeOperator(const Client<T> &client) {
-  _operators.erase(client.socket.getFd());
-}
+  void removeOperator(const Client<T> &client) {
+    _operators.erase(client.socket.getFd());
+  }
 
-bool isOperator(const Client<T> &client) const {
-  return _operators.find(client.socket.getFd()) != _operators.end();
-}
+  bool isOperator(const Client<T> &client) const {
+    return _operators.find(client.socket.getFd()) != _operators.end();
+  }
 
 
 //Password methods and getters
-std::string getPasswd() const {
-	return (this->_passwd);
-}
+  std::string getPasswd() const {
+	  return (this->_passwd);
+  }
 
-void setPasswd(bool action, const std::string &passwd) {
-	this->_hasPasswd = action;
-  if(action == false)
-    this->_passwd = "";
-  else
-	  this->_passwd = passwd;
-}
+  void setPasswd(bool action, const std::string &passwd) {
+	  this->_hasPasswd = action;
+    if(action == false)
+      this->_passwd = "";
+    else
+	    this->_passwd = passwd;
+  }
 
 //Topic methods and getters
-std::string getTopic() const {
-	return (this->_topic);
-}
+  std::string getTopic() const {
+	  return (this->_topic);
+  }
 
-void setTopic(const std::string &topic) {
-	this->_topic = topic;
-}
+  void setTopic(const std::string &topic) {
+	  this->_topic = topic;
+  }
 
-void setTopicRestricted(bool action) {
-	this->_opTopicOnly = action;
-}
+  void setTopicRestricted(bool action) {
+	  this->_opTopicOnly = action;
+  }
 
-bool isTopicOPOnly() {
-    if (this->_opTopicOnly)
-        return false;
-    return true;
-}
+  bool isTopicOPOnly() {
+      if (this->_opTopicOnly)
+          return false;
+      return true;
+  }
 
 //User limit methods and getters
-size_t getUserLimit() const {
-	return (this->_userLimit);
-}
+  size_t getUserLimit() const {
+    return (this->_userLimit);
+  }
 
-void setUserLimit(bool action, const size_t &userLimit) {
-    this->_hasUserlimit = action;
-  if(action == false)
-    this->_userLimit = -1;
-  else
-	  this->_userLimit = userLimit;
-}
+  void setUserLimit(bool action, const size_t &userLimit) {
+      this->_hasUserlimit = action;
+    if(action == false)
+      this->_userLimit = -1;
+    else
+      this->_userLimit = userLimit;
+  }
 
-//Invite only methods and getters
-bool getIsInviteOnly() const {
-	return (this->_isInviteOnly);
-}
+  //Invite only methods and getters
+  bool getIsInviteOnly() const {
+    return (this->_isInviteOnly);
+  }
 
-void setIsInviteOnly(bool action) {
-	this->_isInviteOnly = action;
-}
+  void setIsInviteOnly(bool action) {
+    this->_isInviteOnly = action;
+  }
 
 private:
 
