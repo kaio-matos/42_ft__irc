@@ -77,10 +77,6 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 
 #include <replies.hpp>
 
-template <typename T> Channel<T> &GamesChannel(void) {
-  static Channel<T> *createdChannel = new Channel<T>("Games");
-  return *createdChannel;
-}
 
 std::string BROADCAST(std::vector<std::string> args,
                       Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);

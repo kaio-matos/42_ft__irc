@@ -6,14 +6,14 @@ std::string BROADCAST(std::vector<std::string> args,
     return "usage: BROADCAST channel message\n";
   }
 
-  std::string channel = args[0];
+  std::string channelName = args[0];
   std::string message = args[1];
 
-  if (channel == "Games") {
-    Channel<sockaddr_in> c = GamesChannel<sockaddr_in>();
-    c.broadcast(c.getClient(from_socket), message + "\n");
-    return "Message sent successfully";
-  }
+  Channel<sockaddr_in> *channel = irc.getChannel(channelName);
+  if(!channel)
+    return (ERR_NOSUCHCHANNEL(irc.getClient(from_socket.getFd())->user.nickname, channelName));
 
-  return "Channel not found";
+  channel->broadcast(channel->getClient(from_socket), message + "\n");
+  return "Message sent successfully";
+  
 }

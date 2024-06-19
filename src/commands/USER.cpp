@@ -11,8 +11,6 @@ std::string USER(std::vector<std::string> args,
 
   irc.addClient(createdClient);
 
-  GamesChannel<sockaddr_in>().connectClient(createdClient);
-
   return "User identified successfully as " + createdUser.nickname + " (" +
          createdUser.username + ")\n";
 }
