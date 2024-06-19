@@ -13,8 +13,8 @@ std::string KICK(std::vector<std::string> args,
   try {
     Client<sockaddr_in> client = channel.getClient(name);
     channel.disconnectClient(client);
-    client.socket.write("You got kicked from " + channel.topic + "\n");
-    return "Kicked " + name + " from " + channel.topic + "\n";
+    client.socket.write("You got kicked from " + channel.getTopic() + "\n");
+    return "Kicked " + name + " from " + channel.getTopic() + "\n";
   } catch (const std::exception e) {
     return "Client with name " + name + " not found " + "\n";
   }

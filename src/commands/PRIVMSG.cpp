@@ -24,9 +24,9 @@ std::string PRIVMSG(std::vector<std::string> args,
       irc.getClient(target_nickname_or_channel);
 
   if (target_channel) {
-    target_channel->broadcast(*client, ":" + client->user.nickname +
-                                           " PRIVMSG " + target_channel->topic +
-                                           " :" + message);
+    target_channel->broadcast(*client,
+                              ":" + client->user.nickname + " PRIVMSG " +
+                                  target_channel->getTopic() + " :" + message);
     return "\n";
   }
 
