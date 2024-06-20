@@ -12,8 +12,6 @@ std::string PRIVMSG(std::vector<std::string> args,
   std::string target_nickname_or_channel = args[0];
   std::string message = std::string(args[1]);
 
-  message.erase(
-      message.begin()); // delete ':' from the beggining of the message
   for (int i = 2; i < args.size(); i++) {
     message.append(" ");
     message.append(args[i]);

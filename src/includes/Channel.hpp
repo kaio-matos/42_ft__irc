@@ -5,7 +5,7 @@
 template <typename T> class Channel {
 
 public:
-  typedef std::map<int, Client<T> > map;
+  typedef std::map<int, Client<T> *> map;
 
   Channel(std::string topic)
       : _topic(topic), _opTopicOnly(false), _hasPasswd(false), _userLimit(-1),
@@ -38,7 +38,7 @@ public:
   void connectClient(Client<T> &client) {
     DebugLog << "Client fd: " << client.socket.getFd();
     _clients.insert(
-        typename Channel::map::value_type(client.socket.getFd(), client));
+        typename Channel::map::value_type(client.socket.getFd(), &client));
     broadcast(client,
               "New user " + client.user.nickname + " has entered the channel");
   };
@@ -47,7 +47,7 @@ public:
     typename map::iterator it = _clients.begin();
 
     for (it = _clients.begin(); it != _clients.end(); ++it) {
-      if (it->second == client) {
+      if (*it->second == client) {
         _clients.erase(it);
         return true;
       }
@@ -58,26 +58,24 @@ public:
   void broadcast(Client<T> from, std::string message) {
     typename map::iterator it = _clients.begin();
     for (it; it != _clients.end(); it++) {
-      if (from != it->second) {
-        DebugLog << it->second;
-        it->second.socket.write(SSTR(it->second.socket.getFd()) + " " +
-                                message);
+      if (from != *it->second) {
+        DebugLog << *it->second;
+        it->second->socket.write(SSTR(it->second->socket.getFd()) + " " +
+                                 message);
       }
     }
   };
 
   map getClients(void) const { return _clients; };
 
-  Client<T> *getClient(Socket<T> socket) {
-    return &_clients.at(socket.getFd());
-  }
+  Client<T> *getClient(Socket<T> socket) { return _clients.at(socket.getFd()); }
 
   Client<T> *getClient(std::string name) {
     typename map::iterator it = _clients.begin();
 
     for (it; it != _clients.end(); it++) {
-      if (name == it->second.user.username) {
-        return &it->second;
+      if (name == it->second->user.username) {
+        return it->second;
       }
     }
     return NULL;
@@ -87,7 +85,7 @@ public:
     std::string userList;
     for (typename map::const_iterator it = _clients.begin();
          it != _clients.end(); ++it) {
-      userList += it->second.user.nickname + " ";
+      userList += it->second->user.nickname + " ";
     }
     if (!userList.empty()) {
       userList.resize(userList.size() -
@@ -96,9 +94,9 @@ public:
     return userList;
   }
 
-  void addOperator(const Client<T> &client) {
+  void addOperator(Client<T> &client) {
     _operators.insert(
-        typename Channel::map::value_type(client.socket.getFd(), client));
+        typename Channel::map::value_type(client.socket.getFd(), &client));
   }
 
   void removeOperator(const Client<T> &client) {

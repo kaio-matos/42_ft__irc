@@ -47,13 +47,15 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value) {
     sockaddr_in addr = value.getRawAddr();
     os << "\tPort:                 " << ntohs(addr.sin_port) << "\n";
   } catch (const std::exception &e) {
-    os << "\tPort:                 " << "unavailable\n";
+    os << "\tPort:                 "
+       << "unavailable\n";
   }
   try {
     sockaddr_in addr = value.getRawAddr();
     os << "\tAddress:              " << getAddressFromSockAddrin(addr) << "\n";
   } catch (const std::exception &e) {
-    os << "\tAddress:              " << "unavailable\n";
+    os << "\tAddress:              "
+       << "unavailable\n";
   }
   os << "\tIs Writable:          " << value.isWritable() << "\n"
      << "\tLast Pending Message: " << value.getPendingMessagesToWrite().front()
@@ -79,7 +81,8 @@ std::ostream &operator<<(std::ostream &os, const Client<sockaddr_in> &value) {
 }
 
 std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value) {
-  std::map<int, Client<sockaddr_in> >::iterator it = value.getClients().begin();
+  std::map<int, Client<sockaddr_in> *>::iterator it =
+      value.getClients().begin();
 
   os << "Channel {\n"
      << "\tTopic: " << value.getTopic() << "\n"
