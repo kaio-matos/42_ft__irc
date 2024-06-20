@@ -1,6 +1,6 @@
 #include <ft_irc.hpp>
 
-User::User(std::string username, std::string nickname)
+User::User(std::string nickname, std::string username)
     : username(username), nickname(nickname) {}
 
 User::User(const User &value)

@@ -3,10 +3,11 @@
 // https://modern.ircdocs.horse/#privmsg-message
 std::string PRIVMSG(std::vector<std::string> args,
                     Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
-  if (args.size() < 2) {
-    return "usage: PRIVMSG <target> <text to be sent>";
+  Client<sockaddr_in> *from = irc.getClient(from_socket.getFd());
+
+  if (args.size() != 2) {
+    return ERR_NEEDMOREPARAMS(from->user.nickname, "PRIVMSG");
   }
-  Client<sockaddr_in> *client = irc.getClient(from_socket.getFd());
 
   std::string target_nickname_or_channel = args[0];
   std::string message = std::string(args[1]);
@@ -23,18 +24,40 @@ std::string PRIVMSG(std::vector<std::string> args,
   Client<sockaddr_in> *target_client =
       irc.getClient(target_nickname_or_channel);
 
+  if (false) { // TODO:
+    return ERR_NOSUCHSERVER(from->user.nickname, "servername");
+  }
+
+  if (false) { // TODO:
+    return ERR_CANNOTSENDTOCHAN(from->user.nickname,
+                                target_channel->getTopic());
+  }
+
+  if (false) { // TODO:
+    return ERR_NORECIPIENT(from->user.nickname, "PRIVMSG");
+  }
+
+  if (false) { // TODO:
+    return ERR_NOTEXTTOSEND(from->user.nickname);
+  }
+
   if (target_channel) {
-    target_channel->broadcast(*client,
-                              ":" + client->user.nickname + " PRIVMSG " +
-                                  target_channel->getTopic() + " :" + message);
-    return "\n";
+    target_channel->broadcast(*from, ":" + from->user.nickname + " PRIVMSG " +
+                                         target_channel->getTopic() + " :" +
+                                         message);
+    return "";
   }
 
   if (target_client) {
-    target_client->socket.write(":" + client->user.nickname +
+    if (false) { // TODO:
+      return RPL_AWAY(from->user.nickname, target_client->user.nickname,
+                      target_client->awayMessage);
+    }
+
+    target_client->socket.write(":" + from->user.nickname +
                                 " PRIVMSG :" + message);
-    return "\n";
+    return "";
   }
 
-  return "No such nick/channel\n";
+  return ERR_NOSUCHNICK(from->user.nickname, target_nickname_or_channel);
 }

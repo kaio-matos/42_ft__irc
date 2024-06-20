@@ -7,12 +7,16 @@ template <typename T> class Channel {
 public:
   typedef std::map<int, Client<T> > map;
 
-  Channel(std::string topic) : _topic(topic), _opTopicOnly(false), _hasPasswd(false), _userLimit(-1), _hasUserlimit(false), _isInviteOnly(false) {}
+  Channel(std::string topic)
+      : _topic(topic), _opTopicOnly(false), _hasPasswd(false), _userLimit(-1),
+        _hasUserlimit(false), _isInviteOnly(false) {}
 
   Channel(const Channel &value)
-      : _topic(value._topic), _clients(value._clients), _operators(value._operators),
-        _opTopicOnly(value._opTopicOnly), _passwd(value._passwd), _hasPasswd(value._hasPasswd),
-        _userLimit(value._userLimit), _hasUserlimit(value._hasUserlimit), _isInviteOnly(value._isInviteOnly) {}
+      : _topic(value._topic), _clients(value._clients),
+        _operators(value._operators), _opTopicOnly(value._opTopicOnly),
+        _passwd(value._passwd), _hasPasswd(value._hasPasswd),
+        _userLimit(value._userLimit), _hasUserlimit(value._hasUserlimit),
+        _isInviteOnly(value._isInviteOnly) {}
 
   Channel &operator=(const Channel &value) {
     if (this != &value) {
@@ -39,20 +43,20 @@ public:
               "New user " + client.user.nickname + " has entered the channel");
   };
 
-  void disconnectClient(Client<T> client) {
+  bool disconnectClient(Client<T> client) {
     typename map::iterator it = _clients.begin();
 
     for (it = _clients.begin(); it != _clients.end(); ++it) {
       if (it->second == client) {
         _clients.erase(it);
-        break;
+        return true;
       }
     }
+    return false;
   };
 
   void broadcast(Client<T> from, std::string message) {
     typename map::iterator it = _clients.begin();
-    DebugLog << "BEGIN";
     for (it; it != _clients.end(); it++) {
       if (from != it->second) {
         DebugLog << it->second;
@@ -60,40 +64,41 @@ public:
                                 message);
       }
     }
-    DebugLog << "END";
   };
 
   map getClients(void) const { return _clients; };
 
-  Client<T> getClient(Socket<T> socket) const {
-    return _clients.at(socket.getFd());
+  Client<T> *getClient(Socket<T> socket) {
+    return &_clients.at(socket.getFd());
   }
 
-  Client<T> getClient(std::string name) const {
-    typename map::const_iterator it = _clients.begin();
+  Client<T> *getClient(std::string name) {
+    typename map::iterator it = _clients.begin();
 
     for (it; it != _clients.end(); it++) {
       if (name == it->second.user.username) {
-        return it->second;
+        return &it->second;
       }
     }
-    throw std::runtime_error("Client not found");
+    return NULL;
   }
 
   std::string getChannelUsers() const {
     std::string userList;
-    for (typename map::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        userList += it->second.user.nickname + " ";
+    for (typename map::const_iterator it = _clients.begin();
+         it != _clients.end(); ++it) {
+      userList += it->second.user.nickname + " ";
     }
     if (!userList.empty()) {
-        userList.resize(userList.size() - 1); // Remove o último caractere (espaço em branco)
+      userList.resize(userList.size() -
+                      1); // Remove o último caractere (espaço em branco)
     }
     return userList;
   }
 
-
   void addOperator(const Client<T> &client) {
-    _operators.insert(typename Channel::map::value_type(client.socket.getFd(), client));
+    _operators.insert(
+        typename Channel::map::value_type(client.socket.getFd(), client));
   }
 
   void removeOperator(const Client<T> &client) {
@@ -104,76 +109,60 @@ public:
     return _operators.find(client.socket.getFd()) != _operators.end();
   }
 
-
-//Password methods and getters
-  std::string getPasswd() const {
-	  return (this->_passwd);
-  }
+  // Password methods and getters
+  std::string getPasswd() const { return (this->_passwd); }
 
   void setPasswd(bool action, const std::string &passwd) {
-	  this->_hasPasswd = action;
-    if(action == false)
+    this->_hasPasswd = action;
+    if (action == false)
       this->_passwd = "";
     else
-	    this->_passwd = passwd;
+      this->_passwd = passwd;
   }
 
-//Topic methods and getters
-  std::string getTopic() const {
-	  return (this->_topic);
-  }
+  // Topic methods and getters
+  std::string getTopic() const { return (this->_topic); }
 
-  void setTopic(const std::string &topic) {
-	  this->_topic = topic;
-  }
+  void setTopic(const std::string &topic) { this->_topic = topic; }
 
-  void setTopicRestricted(bool action) {
-	  this->_opTopicOnly = action;
-  }
+  void setTopicRestricted(bool action) { this->_opTopicOnly = action; }
 
   bool isTopicOPOnly() {
-      if (this->_opTopicOnly)
-          return false;
-      return true;
+    if (this->_opTopicOnly)
+      return false;
+    return true;
   }
 
-//User limit methods and getters
-  size_t getUserLimit() const {
-    return (this->_userLimit);
-  }
+  // User limit methods and getters
+  size_t getUserLimit() const { return (this->_userLimit); }
 
   void setUserLimit(bool action, const size_t &userLimit) {
-      this->_hasUserlimit = action;
-    if(action == false)
+    this->_hasUserlimit = action;
+    if (action == false)
       this->_userLimit = -1;
     else
       this->_userLimit = userLimit;
   }
 
-  //Invite only methods and getters
-  bool getIsInviteOnly() const {
-    return (this->_isInviteOnly);
-  }
+  // Invite only methods and getters
+  bool getIsInviteOnly() const { return (this->_isInviteOnly); }
 
-  void setIsInviteOnly(bool action) {
-    this->_isInviteOnly = action;
-  }
+  void setIsInviteOnly(bool action) { this->_isInviteOnly = action; }
 
 private:
-
-  map         _clients;
-  map         _operators;
+  map _clients;
+  map _operators;
 
   std::string _topic;
-  bool        _opTopicOnly;
+  bool _opTopicOnly;
 
   std::string _passwd;
-  bool        _hasPasswd;
+  bool _hasPasswd;
 
-  size_t      _userLimit;
-  bool        _hasUserlimit;
+  size_t _userLimit;
+  bool _hasUserlimit;
 
-  bool        _isInviteOnly;
+  bool _isInviteOnly;
 };
 
 std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value);

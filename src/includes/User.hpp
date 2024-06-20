@@ -5,7 +5,7 @@
 class User {
 public:
 
-  User(std::string username, std::string nickname);
+  User(std::string nickname, std::string username);
 
   User(const User &value);
 

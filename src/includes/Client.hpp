@@ -26,6 +26,7 @@ public:
 
   User user;
   Socket<T> &socket;
+  std::string awayMessage; // TODO:
 };
 
 std::ostream &operator<<(std::ostream &os, const Client<sockaddr_in> &value);

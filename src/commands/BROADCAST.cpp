@@ -10,10 +10,10 @@ std::string BROADCAST(std::vector<std::string> args,
   std::string message = args[1];
 
   Channel<sockaddr_in> *channel = irc.getChannel(channelName);
-  if(!channel)
-    return (ERR_NOSUCHCHANNEL(irc.getClient(from_socket.getFd())->user.nickname, channelName));
+  if (!channel)
+    return (ERR_NOSUCHCHANNEL(irc.getClient(from_socket.getFd())->user.nickname,
+                              channelName));
 
-  channel->broadcast(channel->getClient(from_socket), message + "\n");
+  channel->broadcast(*channel->getClient(from_socket), message + "\n");
   return "Message sent successfully";
-  
 }
