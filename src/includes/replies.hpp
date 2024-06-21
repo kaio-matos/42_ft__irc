@@ -1,16 +1,27 @@
 #ifndef REPLIES_HPP
 #define REPLIES_HPP
 
+#define SERVER_NAME "ft_irc"
+#define SERVER_VERSION "1"
+#define SERVER_USER_MODES "" // TODO: list of user modes
+#define SERVER_CHANNEL_MODES "" // TODO: list of channel modes
+
 #define numericReply(numeric, target, message)      std::string(":ft-irc ") + numeric + " " + target + " " + message + "\r\n"
 
 //comand replies
 #define MSG_JOIN(user, channel)                     (":" + user + " JOIN " + channel + "\r\n")
 
 //numeric replies  
+#define RPL_WELCOME(target, nickname, username)         numericReply("001", target, ":Welcome to the " + SERVER_NAME + " Network, " + nickname + "[!" + username + "@*]")
+#define RPL_YOURHOST(target, servername, version)       numericReply("002", target, ":Your host is " + servername + ", running version " + version)
+#define RPL_CREATED(target)                             numericReply("003", target, ":This server was created <datetime>")
+#define RPL_MYINFO(target)                              numericReply("004", target, SERVER_NAME + " " + SERVER_VERSION +  " " + SERVER_USER_MODES + " " + SERVER_CHANNEL_MODES)
+
 #define RPL_AWAY(target, nickname, message)             numericReply("301", target, nickname + " :" + message)
 #define RPL_TOPIC(target, channel, topic)               numericReply("332", target, channel + " :" + topic)
 #define RPL_NAMREPLY(target, channel, nicknames)        numericReply("353", target, "= " + channel + " :" + nicknames)
 #define RPL_ENDOFNAMES(target, channel)                 numericReply("366", target, channel + " :End of NAMES list")
+
 #define ERR_NOSUCHNICK(target, nickname)                numericReply("401", target, nickname + " :No such nick/channel")
 #define ERR_NOSUCHSERVER(target, servername)            numericReply("402", target, servername + " :No such server")
 #define ERR_NOSUCHCHANNEL(target, channel)              numericReply("403", target, channel + " :No such channel")

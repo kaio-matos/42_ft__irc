@@ -15,6 +15,8 @@ void sigpipe_handler(int s) {
 template <typename T>
 std::string onRequest(std::string request, Socket<T> &from_socket,
                       IRC<T> &irc) {
+  if (request.empty())
+    return "";
   DebugLog << "---------------------------------------------";
   DebugLog << request;
 
@@ -36,9 +38,9 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   if (command == "INVITE")
     return INVITE(args, from_socket, irc);
 
-  //if (command == "TOPIC")
-  //  return TOPIC(args, from_socket, irc);
-  if(command == "JOIN")
+  // if (command == "TOPIC")
+  //   return TOPIC(args, from_socket, irc);
+  if (command == "JOIN")
     return JOIN(args, from_socket, irc);
   if (command == "MODE")
     return MODE(args, from_socket, irc);
@@ -50,7 +52,7 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
     return PRIVMSG(args, from_socket, irc);
 
   DebugLog << "---------------------------------------------";
-  return "Error: command not found\n";
+  return "";
 }
 
 template <typename T> void sendResponse(Socket<T> &to_socket, IRC<T> &irc) {}
