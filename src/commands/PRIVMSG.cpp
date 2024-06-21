@@ -5,12 +5,12 @@ std::string PRIVMSG(std::vector<std::string> args,
                     Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
   Client<sockaddr_in> *from = irc.getClient(from_socket.getFd());
 
-  if (args.size() != 2) {
+  if (args.size() < 2) {
     return ERR_NEEDMOREPARAMS(from->user.nickname, "PRIVMSG");
   }
 
   std::string target_nickname_or_channel = args[0];
-  std::string message = std::string(args[1]);
+  std::string message = args[1];
 
   for (int i = 2; i < args.size(); i++) {
     message.append(" ");
@@ -41,7 +41,7 @@ std::string PRIVMSG(std::vector<std::string> args,
 
   if (target_channel) {
     target_channel->broadcast(*from, ":" + from->user.nickname + " PRIVMSG " +
-                                         target_channel->getTopic() + " :" +
+                                         target_channel->getTopic() + " " +
                                          message);
     return "";
   }
@@ -52,8 +52,8 @@ std::string PRIVMSG(std::vector<std::string> args,
                       target_client->awayMessage);
     }
 
-    target_client->socket.write(":" + from->user.nickname +
-                                " PRIVMSG :" + message);
+    target_client->socket.write(":" + from->user.nickname + " PRIVMSG " +
+                                message);
     return "";
   }
 
