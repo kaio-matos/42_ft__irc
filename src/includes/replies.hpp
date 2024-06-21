@@ -5,6 +5,7 @@
 #define SERVER_VERSION "1"
 #define SERVER_USER_MODES "" // TODO: list of user modes
 #define SERVER_CHANNEL_MODES "" // TODO: list of channel modes
+#define SERVER_CREATED_AT "06/01/2024"
 
 #define numericReply(numeric, target, message)      std::string(":ft-irc ") + numeric + " " + target + " " + message + "\r\n"
 
@@ -14,7 +15,7 @@
 //numeric replies  
 #define RPL_WELCOME(target, nickname, username)         numericReply("001", target, ":Welcome to the " + SERVER_NAME + " Network, " + nickname + "[!" + username + "@*]")
 #define RPL_YOURHOST(target, servername, version)       numericReply("002", target, ":Your host is " + servername + ", running version " + version)
-#define RPL_CREATED(target)                             numericReply("003", target, ":This server was created <datetime>")
+#define RPL_CREATED(target)                             numericReply("003", target, ":This server was created " + SERVER_CREATED_AT)
 #define RPL_MYINFO(target)                              numericReply("004", target, SERVER_NAME + " " + SERVER_VERSION +  " " + SERVER_USER_MODES + " " + SERVER_CHANNEL_MODES)
 
 #define RPL_AWAY(target, nickname, message)             numericReply("301", target, nickname + " :" + message)
