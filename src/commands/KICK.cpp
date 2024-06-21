@@ -15,8 +15,6 @@ std::string KICK(std::vector<std::string> args,
     comment = args[2];
   }
 
-  DebugLog << "hello";
-
   Channel<sockaddr_in> *channel = irc.getChannel(channel_name);
 
   if (!channel) {
