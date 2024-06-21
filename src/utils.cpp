@@ -161,6 +161,8 @@ std::vector<std::string> split(std::string str) {
 }
 
 std::vector<std::string> splitByComma(const std::string &data) {
+  if (data.empty()) return std::vector<std::string>();
+
   std::string token;
   std::vector<std::string> tokens;
   std::istringstream iss(data);

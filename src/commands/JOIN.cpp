@@ -15,12 +15,14 @@ std::string JOIN(std::vector<std::string> args, Socket<sockaddr_in> &from_socket
 
     std::vector<std::string> channels = splitByComma(args[0]);
     std::vector<std::string> key;
-    if (key.size() > 1)
-        key = splitByComma(key[1]);
+    if (args.size() == 2)
+        key = splitByComma(args[1]);
 
     std::string reply;
-    if (key.size() != channels.size() && !key.empty())
+
+    if (!key.empty() && key.size() != channels.size()) {
         return ERR_NEEDMOREPARAMS(user, "JOIN");
+    }
     
     //no irc se der "join 0" ele desconecta de todos os canais
     if (channels[0] == "0") {
@@ -41,14 +43,10 @@ std::string JOIN(std::vector<std::string> args, Socket<sockaddr_in> &from_socket
             continue;
         }
 
-        ChannelIterator channel_it = irc.channels.find(channelName);
-        Channel<sockaddr_in> *channel;
-        if (channel_it != irc.channels.end()) {
-            channel = &(channel_it->second);
-        } else {
+        Channel<sockaddr_in> *channel = irc.getChannel(channelName);
+        if (!channel) {
             irc.addChannel(Channel<sockaddr_in>(channelName));
-            channel_it = irc.channels.find(channelName); // Re-busca para atualizar o iterator
-            channel = &(channel_it->second);
+            channel = irc.getChannel(channelName); // Re-busca para atualizar o iterator
             channel->addOperator(client); // Adiciona o cliente como operador
         }
 

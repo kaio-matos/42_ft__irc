@@ -55,14 +55,21 @@ public:
     return false;
   };
 
-  void broadcast(Client<T> from, std::string message) {
+  void broadcast(Client<T> exclude, std::string message) {
     typename map::iterator it = _clients.begin();
     for (it; it != _clients.end(); it++) {
-      if (from != *it->second) {
-        DebugLog << *it->second;
+      if (exclude != *it->second) {
         it->second->socket.write(SSTR(it->second->socket.getFd()) + " " +
                                  message);
       }
+    }
+  };
+
+  void broadcast(std::string message) {
+    typename map::iterator it = _clients.begin();
+    for (it; it != _clients.end(); it++) {
+      it->second->socket.write(SSTR(it->second->socket.getFd()) + " " +
+                               message);
     }
   };
 
