@@ -20,9 +20,9 @@
 #include <iostream>
 #include <poll.h>
 #include <sstream>
-#include <string>
 #include <stdexcept>
 #include <stdio.h>
+#include <string>
 
 #include <map>
 #include <queue>
@@ -77,7 +77,6 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 
 #include <replies.hpp>
 
-
 std::string BROADCAST(std::vector<std::string> args,
                       Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
@@ -90,8 +89,8 @@ std::string KICK(std::vector<std::string> args,
 std::string MODE(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
-//std::string TOPIC(std::vector<std::string> args,
- //                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+// std::string TOPIC(std::vector<std::string> args,
+//                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
 std::string USER(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
@@ -104,4 +103,8 @@ std::string PRIVMSG(std::vector<std::string> args,
 
 std::string JOIN(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
+std::string QUIT(std::vector<std::string> args,
+                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
 #endif

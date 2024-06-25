@@ -58,7 +58,10 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value) {
        << "unavailable\n";
   }
   os << "\tIs Writable:          " << value.isWritable() << "\n"
-     << "\tLast Pending Message: " << value.getPendingMessagesToWrite().front()
+     << "\tLast Pending Message: "
+     << (value.getPendingMessagesToWrite().empty()
+             ? ""
+             : value.getPendingMessagesToWrite().front())
      << "\n}";
 
   return os;
@@ -161,7 +164,8 @@ std::vector<std::string> split(std::string str) {
 }
 
 std::vector<std::string> splitByComma(const std::string &data) {
-  if (data.empty()) return std::vector<std::string>();
+  if (data.empty())
+    return std::vector<std::string>();
 
   std::string token;
   std::vector<std::string> tokens;

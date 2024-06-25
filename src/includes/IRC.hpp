@@ -51,6 +51,27 @@ public:
     return NULL;
   }
 
+  void disconnectClient(Client<T> &client) {
+    for (typename std::map<std::string, Channel<T> >::iterator it =
+             channels.begin();
+         it != channels.end(); it++) {
+      it->second.disconnectClient(client);
+    }
+    typename std::map<int, Client<T> >::iterator clientIt =
+        clients.find(client.socket.getFd());
+    if (clientIt == clients.end())
+      return;
+    clients.erase(clientIt);
+  }
+
+  void broadcast(Client<T> &from, std::string message) {
+    for (typename std::map<std::string, Channel<T> >::iterator it =
+             channels.begin();
+         it != channels.end(); it++) {
+      it->second.broadcast(from, message);
+    }
+  }
+
   std::map<int, Client<T> > clients;
   std::map<std::string, Channel<T> > channels;
 };

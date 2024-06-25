@@ -43,7 +43,7 @@ public:
               "New user " + client.user.nickname + " has entered the channel");
   };
 
-  bool disconnectClient(Client<T> client) {
+  bool disconnectClient(Client<T> &client) {
     typename map::iterator it = _clients.begin();
 
     for (it = _clients.begin(); it != _clients.end(); ++it) {

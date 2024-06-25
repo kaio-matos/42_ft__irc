@@ -4,6 +4,10 @@ std::string NICK(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
   Client<sockaddr_in> *from = irc.getClient(from_socket.getFd());
 
+  if (!from) {
+    return ERR_NOTREGISTERED;
+  }
+
   if (args.size() < 1)
     return ERR_NONICKNAMEGIVEN(from->user.nickname);
 

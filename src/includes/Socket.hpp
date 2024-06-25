@@ -10,6 +10,7 @@ public:
     _protocol = -1;
     _fd = -1;
     _addr = NULL;
+    _pendingMessagesToWrite = std::queue<std::string>();
 
     _isOpen = false;
     _isListener = false;
@@ -25,6 +26,7 @@ public:
     _protocol = protocol;
     _fd = socket(domain, type, protocol);
     _addr = NULL;
+    _pendingMessagesToWrite = std::queue<std::string>();
 
     _isOpen = false;
     _isListener = false;
@@ -231,6 +233,21 @@ public:
         }
       }
     }
+  }
+
+  static void cleanup() {
+    typename std::vector<Socket<T> *>::iterator it;
+
+    for (it = Socket::_sockets.begin(); it != Socket::_sockets.end(); it++) {
+      Socket<T> *socket = *it;
+      socket->close();
+      if (!socket->isServer()) { // work around because the server socket is
+        // not allocated, so we cant delete it
+        delete socket;
+      }
+    }
+
+    Socket::_sockets.clear();
   }
 
   bool isEmpty() const { return (_fd == -1 && _addr == NULL); }

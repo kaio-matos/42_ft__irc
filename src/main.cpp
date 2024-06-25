@@ -1,8 +1,8 @@
 #include <ft_irc.hpp>
 
 void ctrl_c_handler(int s) {
-  DebugLog << "Closing sockets";
-  exit(1);
+  Socket<sockaddr_in>::cleanup();
+  exit(0);
 }
 
 void sigpipe_handler(int s) {
@@ -25,7 +25,6 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   std::vector<std::string> args = split(request);
   std::string command = args[0];
   args.erase(args.begin());
-
   if (command == "USER")
     return USER(args, from_socket, irc);
 
@@ -50,6 +49,9 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
 
   if (command == "PRIVMSG")
     return PRIVMSG(args, from_socket, irc);
+
+  if (command == "QUIT")
+    return QUIT(args, from_socket, irc);
 
   DebugLog << "---------------------------------------------";
   return "";
