@@ -57,7 +57,8 @@ std::string PRIVMSG(std::vector<std::string> args,
     }
 
     target_client->socket.write(":" + from->user.nickname + " PRIVMSG " +
-                                message);
+                                target_client->user.nickname + " " + message +
+                                "\r\n");
     return "";
   }
 
