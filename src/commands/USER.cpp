@@ -13,20 +13,21 @@ std::string USER(std::vector<std::string> args,
     return ERR_ALREADYREGISTERED(createdUser.nickname);
   }
 
-  Client<sockaddr_in> createdClient(createdUser, from_socket);
+  Client<sockaddr_in> *createdClient =
+      new Client<sockaddr_in>(createdUser, from_socket);
 
   irc.addClient(createdClient);
 
   std::string reply;
   reply
-      .append(RPL_WELCOME(createdClient.user.nickname,
-                          createdClient.user.nickname,
-                          createdClient.user.username))
+      .append(RPL_WELCOME(createdClient->user.nickname,
+                          createdClient->user.nickname,
+                          createdClient->user.username))
       .append(RPL_YOURHOST(
-          createdClient.user.nickname, "weechat",
+          createdClient->user.nickname, "weechat",
           "1")) // TODO: check how to get the client name and version
-      .append(RPL_CREATED(createdClient.user.nickname))
-      .append(RPL_MYINFO(createdClient.user.nickname));
+      .append(RPL_CREATED(createdClient->user.nickname))
+      .append(RPL_MYINFO(createdClient->user.nickname));
 
   return reply;
 }

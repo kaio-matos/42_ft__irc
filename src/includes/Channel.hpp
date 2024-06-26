@@ -10,7 +10,8 @@ public:
 
   Channel(std::string channelName)
       : _channelName(channelName), _opTopicOnly(false), _hasPasswd(false),
-        _userLimit(-1), _hasUserlimit(false), _isInviteOnly(false) {}
+        _userLimit(-1), _hasUserlimit(false), _isInviteOnly(false),
+        _clients(Channel::map()), _operators(Channel::map()) {}
 
   Channel(const Channel &value)
       : _channelName(value._channelName), _topic(value._topic),
@@ -40,8 +41,7 @@ public:
 
   void connectClient(Client<T> &client) {
     DebugLog << "Client fd: " << client.socket.getFd();
-    _clients.insert(
-        typename Channel::map::value_type(client.socket.getFd(), &client));
+    _clients.insert(std::make_pair(client.socket.getFd(), &client));
     broadcast(client,
               "New user " + client.user.nickname + " has entered the channel");
   };
@@ -116,9 +116,7 @@ public:
   }
 
   void addOperator(Client<T> *client) {
-    DebugLog << "Client fd: " << client;
-    _operators.insert(
-        typename Channel::map::value_type(client->socket.getFd(), client));
+    _operators.insert(std::make_pair(client->socket.getFd(), client));
   };
 
   void removeOperator(const Client<T> &client) {

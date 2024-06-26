@@ -16,53 +16,68 @@ public:
     }
     return *this;
   };
-  ~IRC(void){};
+  ~IRC(void) {
+    typename std::map<int, Client<T> *>::iterator it = clients.begin();
 
-  void addClient(Client<T> client) {
-    clients.insert(typename std::map<int, Client<T> >::value_type(
-        client.socket.getFd(), client));
+    for (; it != clients.end(); it++) {
+      delete it->second;
+    }
+
+    clients.clear();
+
+    typename std::map<std::string, Channel<T> *>::iterator channelIt =
+        channels.begin();
+
+    for (; channelIt != channels.end(); channelIt++) {
+      delete channelIt->second;
+    }
+
+    channels.clear();
   };
 
-  void addChannel(Channel<T> channel) {
-    channels.insert(typename std::map<std::string, Channel<T> >::value_type(
-        channel.getTopic(), channel));
+  void addClient(Client<T> *client) {
+    clients.insert(std::make_pair(client->socket.getFd(), client));
+  };
+
+  void addChannel(Channel<T> *channel) {
+    channels.insert(std::make_pair(channel->getChannelName(), channel));
   };
 
   Client<T> *getClient(std::string nickname) {
-    typename std::map<int, Client<T> >::iterator it = clients.begin();
+    typename std::map<int, Client<T> *>::iterator it = clients.begin();
 
     for (; it != clients.end(); it++) {
-      if (it->second.user.nickname == nickname) {
-        return &it->second;
+      if (it->second->user.nickname == nickname) {
+        return it->second;
       }
     }
     return NULL;
   }
 
   Client<T> *getClient(int fd) {
-    typename std::map<int, Client<T> >::iterator it = clients.find(fd);
+    typename std::map<int, Client<T> *>::iterator it = clients.find(fd);
     if (it != clients.end())
-      return (&it->second);
+      return (it->second);
     return (NULL);
   }
 
-  Channel<T> *getChannel(std::string topic) {
-    typename std::map<std::string, Channel<T> >::iterator it =
-        channels.find(topic);
+  Channel<T> *getChannel(std::string name) {
+    typename std::map<std::string, Channel<T> *>::iterator it =
+        channels.find(name);
 
     if (it != channels.end()) {
-      return &it->second;
+      return it->second;
     }
     return NULL;
   }
 
   void disconnectClient(Client<T> &client) {
-    for (typename std::map<std::string, Channel<T> >::iterator it =
+    for (typename std::map<std::string, Channel<T> *>::iterator it =
              channels.begin();
          it != channels.end(); it++) {
-      it->second.disconnectClient(client);
+      it->second->disconnectClient(client);
     }
-    typename std::map<int, Client<T> >::iterator clientIt =
+    typename std::map<int, Client<T> *>::iterator clientIt =
         clients.find(client.socket.getFd());
     if (clientIt == clients.end())
       return;
@@ -70,14 +85,14 @@ public:
   }
 
   void broadcast(Client<T> &from, std::string message) {
-    for (typename std::map<std::string, Channel<T> >::iterator it =
+    for (typename std::map<std::string, Channel<T> *>::iterator it =
              channels.begin();
          it != channels.end(); it++) {
-      it->second.broadcast(from, message);
+      it->second->broadcast(from, message);
     }
   }
 
-  std::map<int, Client<T> > clients;
-  std::map<std::string, Channel<T> > channels;
+  std::map<int, Client<T> *> clients;
+  std::map<std::string, Channel<T> *> channels;
 };
 #endif

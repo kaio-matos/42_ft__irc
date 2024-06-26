@@ -47,7 +47,7 @@ std::string JOIN(std::vector<std::string> args,
 
     Channel<sockaddr_in> *channel = irc.getChannel(channelName);
     if (!channel) {
-      irc.addChannel(Channel<sockaddr_in>(channelName));
+      irc.addChannel(new Channel<sockaddr_in>(channelName));
       channel = irc.getChannel(channelName);
       channel->addOperator(client); // Adiciona o cliente como operador
     }

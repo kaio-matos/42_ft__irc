@@ -88,6 +88,7 @@ std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value) {
       value.getClients().begin();
 
   os << "Channel {\n"
+     << "\tName: " << value.getChannelName() << "\n"
      << "\tTopic: " << value.getTopic() << "\n"
      << "\tClients: ";
 
