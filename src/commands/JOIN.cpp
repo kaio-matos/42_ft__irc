@@ -9,12 +9,12 @@ std::string JOIN(std::vector<std::string> args,
   // ClientIterator client_it = irc.clients.find(from_socket.getFd());
 
   Client<sockaddr_in> *client = irc.getClient(from_socket.getFd());
-  std::string nick = client->user.nickname;
-  std::string user = client->user.username;
-
   if (!client) {
     return ERR_NOTREGISTERED;
   }
+  std::string nick = client->user.nickname;
+  std::string user = client->user.username;
+
   std::vector<std::string> channels = splitByComma(args[0]);
   std::vector<std::string> key;
   if (key.size() > 1)
@@ -47,15 +47,10 @@ std::string JOIN(std::vector<std::string> args,
 
     Channel<sockaddr_in> *channel = irc.getChannel(channelName);
     if (!channel) {
-      std::cout << "Bp 1\n" << std::endl;
       irc.addChannel(Channel<sockaddr_in>(channelName));
-      std::cout << "Bp 2\n" << std::endl;
       channel = irc.getChannel(channelName);
-      std::cout << "Bp 3 " << channelName << "\n" << std::endl;
-      // channel->addOperator(*client); // Adiciona o cliente como operador
-      std::cout << "Bp 4\n" << std::endl;
+      channel->addOperator(client); // Adiciona o cliente como operador
     }
-    std::cout << "Bp 5\n" << std::endl;
 
     /*
     if (channel->getIsInviteOnly() && !client.channelOnInviteList(channelName))
@@ -63,22 +58,18 @@ std::string JOIN(std::vector<std::string> args,
     }
     */
 
-    //if (channel->isClientInChannel(*client))
-      //continue;
-    std::cout << "Bp 6\n" << std::endl;
+    if (channel->isClientInChannel(*client))
+      continue;
     if (!channelKey.empty() && channel->getPasswd() != channelKey) {
       reply += ERR_BADCHANNELKEY(user, channelName);
       continue;
     }
-    std::cout << "Bp 7\n" << std::endl;
     if (channel->getClients().size() >= channel->getUserLimit()) {
       reply += ERR_CHANNELISFULL(user, channelName);
       continue;
     }
 
-    std::cout << "Bp 8\n" << std::endl;
     channel->connectClient(*client);
-    std::cout << "Bp 9\n" << std::endl;
     std::string channelUsers = channel->getChannelUsers();
 
     reply += MSG_JOIN(user, channelName) +
