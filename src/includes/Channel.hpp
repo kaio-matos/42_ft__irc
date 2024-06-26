@@ -2,24 +2,27 @@
 #define CHANNEL_H
 #include <ft_irc.hpp>
 
+// todo por nome e ajeitar o topic
 template <typename T> class Channel {
 
 public:
   typedef std::map<int, Client<T> *> map;
 
-  Channel(std::string topic)
-      : _topic(topic), _opTopicOnly(false), _hasPasswd(false), _userLimit(-1),
-        _hasUserlimit(false), _isInviteOnly(false) {}
+  Channel(std::string channelName)
+      : _channelName(channelName), _opTopicOnly(false), _hasPasswd(false),
+        _userLimit(-1), _hasUserlimit(false), _isInviteOnly(false) {}
 
   Channel(const Channel &value)
-      : _topic(value._topic), _clients(value._clients),
-        _operators(value._operators), _opTopicOnly(value._opTopicOnly),
-        _passwd(value._passwd), _hasPasswd(value._hasPasswd),
-        _userLimit(value._userLimit), _hasUserlimit(value._hasUserlimit),
-        _isInviteOnly(value._isInviteOnly) {}
+      : _channelName(value._channelName), _topic(value._topic),
+        _clients(value._clients), _operators(value._operators),
+        _opTopicOnly(value._opTopicOnly), _passwd(value._passwd),
+        _hasPasswd(value._hasPasswd), _userLimit(value._userLimit),
+        _hasUserlimit(value._hasUserlimit), _isInviteOnly(value._isInviteOnly) {
+  }
 
   Channel &operator=(const Channel &value) {
     if (this != &value) {
+      _channelName = value._channelName;
       _clients = value._clients;
       _operators = value._operators;
       _topic = value.getTopic();
@@ -101,10 +104,22 @@ public:
     return userList;
   }
 
-  void addOperator(Client<T> &client) {
-    _operators.insert(
-        typename Channel::map::value_type(client.socket.getFd(), &client));
+  bool isClientInChannel(const Client<T> &client) const {
+    typename std::map<int, Client<T> *>::const_iterator it = _clients.begin();
+
+    for (; it != _clients.end(); ++it) {
+      if (client.user.username == it->second->user.username) {
+        return true;
+      }
+    }
+    return false;
   }
+
+  void addOperator(Client<T> *client) {
+    DebugLog << "Client fd: " << client;
+    _operators.insert(
+        typename Channel::map::value_type(client->socket.getFd(), client));
+  };
 
   void removeOperator(const Client<T> &client) {
     _operators.erase(client.socket.getFd());
@@ -123,6 +138,12 @@ public:
       this->_passwd = "";
     else
       this->_passwd = passwd;
+  }
+
+  std::string getChannelName() const { return (this->_channelName); }
+
+  void setChannelName(const std::string &channelName) {
+    this->_channelName = channelName;
   }
 
   // Topic methods and getters
@@ -158,6 +179,7 @@ private:
   map _clients;
   map _operators;
 
+  std::string _channelName;
   std::string _topic;
   bool _opTopicOnly;
 
