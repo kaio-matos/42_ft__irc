@@ -169,8 +169,7 @@ public:
   }
 
   // Invite only methods and getters
-  bool getIsInviteOnly() const { return (this->_isInviteOnly); }
-
+  bool isInviteOnly() const { return (this->_isInviteOnly); }
   void setIsInviteOnly(bool action) { this->_isInviteOnly = action; }
 
 private:

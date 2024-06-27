@@ -22,7 +22,7 @@ std::string JOIN(std::vector<std::string> args,
 
   std::string reply;
   if (key.size() != channels.size() && !key.empty())
-    return ERR_NEEDMOREPARAMS(user, "JOIN");
+    return ERR_NEEDMOREPARAMS(nick, "JOIN");
 
   /*
   //no irc se der "join 0" ele desconecta de todos os canais
@@ -41,7 +41,7 @@ std::string JOIN(std::vector<std::string> args,
       channelKey = key[i];
 
     if (channelName[0] != '#' && channelName[0] != '&') {
-      reply += ERR_NOSUCHCHANNEL(user, channelName);
+      reply += ERR_NOSUCHCHANNEL(nick, channelName);
       continue;
     }
 
@@ -52,27 +52,27 @@ std::string JOIN(std::vector<std::string> args,
       channel->addOperator(client); // Adiciona o cliente como operador
     }
 
-    /*
-    if (channel->getIsInviteOnly() && !client.channelOnInviteList(channelName))
-    { reply += ERR_INVITEONLYCHAN(user, channelName); continue;
-    }
-    */
+    // if (channel->isInviteOnly() && !client.channelOnInviteList(channelName))
+    // {
+    //   reply += ERR_INVITEONLYCHAN(nick, channelName);
+    //   continue;
+    // }
 
     if (channel->isClientInChannel(*client))
       continue;
     if (!channelKey.empty() && channel->getPasswd() != channelKey) {
-      reply += ERR_BADCHANNELKEY(user, channelName);
+      reply += ERR_BADCHANNELKEY(nick, channelName);
       continue;
     }
     if (channel->getClients().size() >= channel->getUserLimit()) {
-      reply += ERR_CHANNELISFULL(user, channelName);
+      reply += ERR_CHANNELISFULL(nick, channelName);
       continue;
     }
 
     channel->connectClient(*client);
     std::string channelUsers = channel->getChannelUsers();
 
-    reply += MSG_JOIN(user, channelName) +
+    reply += MSG_JOIN(nick, channelName) +
              (channel->getTopic().empty()
                   ? ""
                   : RPL_TOPIC(nick, channelName, channel->getTopic())) +
