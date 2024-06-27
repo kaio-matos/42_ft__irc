@@ -4,7 +4,7 @@
 std::string USER(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
   if (args.size() != 4) {
-    return ERR_NEEDMOREPARAMS(args[3], "USER");
+    return ERR_NEEDMOREPARAMS("User", "USER");
   }
   User createdUser(args[0], args[3]);
   Client<sockaddr_in> *found = irc.getClient(createdUser.nickname);
