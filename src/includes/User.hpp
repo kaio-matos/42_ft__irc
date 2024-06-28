@@ -14,7 +14,7 @@ public:
 
   bool operator==(const User &value) const;
 
-  std::string getIdentity();
+  std::string identity();
 
   std::string nickname;
   std::string username;

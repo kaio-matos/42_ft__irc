@@ -20,6 +20,4 @@ bool User::operator==(const User &value) const {
 
 User::~User(void) {}
 
-std::string User::getIdentity() {
-  return nickname + "!~" + username + "@" + host;
-}
+std::string User::identity() { return nickname + "!~" + username + "@" + host; }
