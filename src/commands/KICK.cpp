@@ -50,6 +50,6 @@ std::string KICK(std::vector<std::string> args,
   }
 
   // TODO: check if we can send this
-  client->socket.write("You got kicked from " + channel->getTopic() + "\n");
+  client->socket.write("You got kicked from " + channel->getTopic() + "\r\n");
   return "";
 }

@@ -7,11 +7,12 @@
 #define SERVER_CHANNEL_MODES "" // TODO: list of channel modes
 #define SERVER_CREATED_AT "06/01/2024"
 
-#define numericReply(numeric, target, message)      std::string(":ft-irc ") + numeric + " " + target + " " + message + "\r\n"
+#define numericReply(numeric, target, message)          std::string(":ft-irc ") + numeric + " " + target + " " + message + "\r\n"
 
 //comand replies
-#define MSG_JOIN(user, channel)                     std::string(":" + user + " JOIN " + channel + "\r\n")
-#define MSG_TOPIC(nick, user, channel, topic)       std::string(":" + nick + "!~" + user + " TOPIC " + channel + " :" + topic + "\r\n")
+#define MSG(str)                                        std::string(":" + str + "\r\n")
+#define MSG_JOIN(user, channel)                         std::string(":" + user + " JOIN " + channel + "\r\n")
+#define MSG_TOPIC(nick, user, channel, topic)           std::string(":" + nick + "!~" + user + " TOPIC " + channel + " :" + topic + "\r\n")
 
 //numeric replies  
 #define RPL_WELCOME(target, nickname, username)         numericReply("001", target, ":Welcome to the " + SERVER_NAME + " Network, " + nickname + "[!" + username + "@*]")

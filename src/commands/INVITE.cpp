@@ -43,9 +43,9 @@ std::string INVITE(std::vector<std::string> args,
                              to_channel->getChannelName());
   }
 
-  invited->socket.write(":" + from->user.identity() + " INVITE " +
-                        invited->user.nickname + " " +
-                        to_channel->getChannelName() + "\r\n");
+  invited->socket.write(MSG(from->user.identity() + " INVITE " +
+                            invited->user.nickname + " " +
+                            to_channel->getChannelName()));
 
   invited->sendInvite(to_channel->getChannelName());
 
