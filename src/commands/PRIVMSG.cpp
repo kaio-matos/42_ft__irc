@@ -9,8 +9,12 @@ std::string PRIVMSG(std::vector<std::string> args,
     return ERR_NOTREGISTERED;
   }
 
+  if (args.size() < 1) {
+    return ERR_NORECIPIENT(from->user.nickname, "PRIVMSG");
+  }
+
   if (args.size() < 2) {
-    return ERR_NEEDMOREPARAMS(from->user.nickname, "PRIVMSG");
+    return ERR_NOTEXTTOSEND(from->user.nickname);
   }
 
   std::string target_nickname_or_channel = args[0];
@@ -33,14 +37,6 @@ std::string PRIVMSG(std::vector<std::string> args,
   if (false) { // TODO:
     return ERR_CANNOTSENDTOCHAN(from->user.nickname,
                                 target_channel->getTopic());
-  }
-
-  if (false) { // TODO:
-    return ERR_NORECIPIENT(from->user.nickname, "PRIVMSG");
-  }
-
-  if (false) { // TODO:
-    return ERR_NOTEXTTOSEND(from->user.nickname);
   }
 
   if (target_channel) {
