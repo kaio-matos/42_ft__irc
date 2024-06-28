@@ -52,11 +52,10 @@ std::string JOIN(std::vector<std::string> args,
       channel->addOperator(client); // Adiciona o cliente como operador
     }
 
-    // if (channel->isInviteOnly() && !client.channelOnInviteList(channelName))
-    // {
-    //   reply += ERR_INVITEONLYCHAN(nick, channelName);
-    //   continue;
-    // }
+    if (channel->isInviteOnly() && !client->hasPendingInviteFrom(channelName)) {
+      reply += ERR_INVITEONLYCHAN(nick, channelName);
+      continue;
+    }
 
     if (channel->isClientInChannel(*client))
       continue;
@@ -70,6 +69,11 @@ std::string JOIN(std::vector<std::string> args,
     }
 
     channel->connectClient(*client);
+
+    if (client->hasPendingInviteFrom(channelName)) {
+      client->acceptInviteFrom(channelName);
+    }
+
     std::string channelUsers = channel->getChannelUsers();
 
     reply += MSG_JOIN(nick, channelName) +

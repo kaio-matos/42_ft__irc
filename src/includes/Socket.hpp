@@ -175,6 +175,7 @@ public:
     //
     // _setSocketAsReusable(cfd);
     // _setSocketAsNonBlocking(cfd);
+    DebugLog << "New client accepted with fd [" << cfd << "]";
     peer_socket->_fd = cfd;
     _sockets.push_back(peer_socket);
   }

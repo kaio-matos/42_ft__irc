@@ -78,13 +78,19 @@ public:
 
   map getClients(void) const { return _clients; };
 
-  Client<T> *getClient(Socket<T> socket) { return _clients.at(socket.getFd()); }
+  Client<T> *getClient(Socket<T> socket) {
+    try {
+      return _clients.at(socket.getFd());
+    } catch (const std::exception &error) {
+      return NULL;
+    }
+  }
 
-  Client<T> *getClient(std::string name) {
+  Client<T> *getClient(std::string nickname) {
     typename map::iterator it = _clients.begin();
 
     for (it; it != _clients.end(); it++) {
-      if (name == it->second->user.username) {
+      if (nickname == it->second->user.nickname) {
         return it->second;
       }
     }
