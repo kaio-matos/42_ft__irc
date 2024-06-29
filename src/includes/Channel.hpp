@@ -9,14 +9,14 @@ public:
   typedef std::map<int, Client<T> *> map;
 
   Channel(std::string channelName)
-      : _channelName(channelName), _opTopicOnly(false), _hasPasswd(false),
+      : _channelName(channelName), _operatorTopicOnly(false), _hasPasswd(false),
         _userLimit(-1), _hasUserlimit(false), _isInviteOnly(false),
         _clients(Channel::map()), _operators(Channel::map()) {}
 
   Channel(const Channel &value)
       : _channelName(value._channelName), _topic(value._topic),
         _clients(value._clients), _operators(value._operators),
-        _opTopicOnly(value._opTopicOnly), _passwd(value._passwd),
+        _operatorTopicOnly(value._operatorTopicOnly), _passwd(value._passwd),
         _hasPasswd(value._hasPasswd), _userLimit(value._userLimit),
         _hasUserlimit(value._hasUserlimit), _isInviteOnly(value._isInviteOnly) {
   }
@@ -27,7 +27,7 @@ public:
       _clients = value._clients;
       _operators = value._operators;
       _topic = value.getTopic();
-      _opTopicOnly = value._opTopicOnly;
+      _operatorTopicOnly = value._operatorTopicOnly;
       _passwd = value._passwd;
       _hasPasswd = value._hasPasswd;
       _userLimit = value._userLimit;
@@ -42,8 +42,8 @@ public:
   void connectClient(Client<T> &client) {
     DebugLog << "Client fd: " << client.socket.getFd();
     _clients.insert(std::make_pair(client.socket.getFd(), &client));
-    broadcast(client,
-              "New user " + client.user.nickname + " has entered the channel");
+    broadcast(client, "New user " + client.user.nickname +
+                          " has entered the channel\n");
   };
 
   bool disconnectClient(Client<T> &client) {
@@ -110,11 +110,11 @@ public:
     return userList;
   }
 
-  bool isClientInChannel(const Client<T> &client) const {
+  bool isClientInChannel(const Client<T> *client) const {
     typename std::map<int, Client<T> *>::const_iterator it = _clients.begin();
 
     for (; it != _clients.end(); ++it) {
-      if (client.user.username == it->second->user.username) {
+      if (client->user.username == it->second->user.username) {
         return true;
       }
     }
@@ -125,16 +125,18 @@ public:
     _operators.insert(std::make_pair(client->socket.getFd(), client));
   };
 
-  void removeOperator(const Client<T> &client) {
-    _operators.erase(client.socket.getFd());
+  void removeOperator(const Client<T> *client) {
+    _operators.erase(client->socket.getFd());
   }
 
-  bool isOperator(const Client<T> &client) const {
-    return _operators.find(client.socket.getFd()) != _operators.end();
+  bool isOperator(const Client<T> *client) const {
+    return _operators.find(client->socket.getFd()) != _operators.end();
   }
 
   // Password methods and getters
   std::string getPasswd() const { return (this->_passwd); }
+
+  bool hasPassword() const { return (this->_hasPasswd); }
 
   void setPasswd(bool action, const std::string &passwd) {
     this->_hasPasswd = action;
@@ -155,16 +157,14 @@ public:
 
   void setTopic(const std::string &topic) { this->_topic = topic; }
 
-  void setTopicRestricted(bool action) { this->_opTopicOnly = action; }
+  void setTopicRestricted(bool action) { this->_operatorTopicOnly = action; }
 
-  bool isTopicOPOnly() {
-    if (this->_opTopicOnly)
-      return false;
-    return true;
-  }
+  bool isTopicOPOnly() const { return (this->_operatorTopicOnly); }
 
   // User limit methods and getters
   size_t getUserLimit() const { return (this->_userLimit); }
+
+  bool hasUserLimit() const { return (this->_hasUserlimit); }
 
   void setUserLimit(bool action, const size_t &userLimit) {
     this->_hasUserlimit = action;
@@ -178,13 +178,39 @@ public:
   bool isInviteOnly() const { return (this->_isInviteOnly); }
   void setIsInviteOnly(bool action) { this->_isInviteOnly = action; }
 
+  std::string getModes() const {
+
+    std::string modes = "+";
+    std::string modeParams = "";
+
+    if (this->getIsInviteOnly())
+      modes += 'i';
+
+    if (this->isTopicOPOnly())
+      modes += 't';
+
+    if (this->hasPassword()) {
+      modes += 'k';
+      modeParams += this->getPasswd() + " ";
+    }
+
+    if (this->hasUserLimit()) {
+      modes += 'l';
+      std::ostringstream oss;
+      oss << this->_userLimit;
+      modeParams += oss.str() + " ";
+    }
+
+    return (std::string(modes + " " + modeParams));
+  }
+
 private:
   map _clients;
   map _operators;
 
   std::string _channelName;
   std::string _topic;
-  bool _opTopicOnly;
+  bool _operatorTopicOnly;
 
   std::string _passwd;
   bool _hasPasswd;

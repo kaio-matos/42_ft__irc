@@ -12,6 +12,7 @@
 //comand replies
 #define MSG(str)                                        std::string(":" + str + "\r\n")
 #define MSG_JOIN(user, channel)                         std::string(":" + user + " JOIN " + channel + "\r\n")
+#define MSG_MODE(nick, user, channel)                   std::string(":" + nick + "!~" + user + " MODE " + channel + " ")
 #define MSG_TOPIC(nick, user, channel, topic)           std::string(":" + nick + "!~" + user + " TOPIC " + channel + " :" + topic + "\r\n")
 
 //numeric replies  
@@ -20,6 +21,7 @@
 #define RPL_CREATED(target)                             numericReply("003", target, ":This server was created " + SERVER_CREATED_AT)
 #define RPL_MYINFO(target)                              numericReply("004", target, SERVER_NAME + " " + SERVER_VERSION +  " " + SERVER_USER_MODES + " " + SERVER_CHANNEL_MODES)
 #define RPL_AWAY(target, nickname, message)             numericReply("301", target, nickname + " :" + message)
+#define RPL_CHANNELMODEIS(target, channel, modes)       numericReply("324", target, channel + modes)
 #define RPL_NOTOPIC(target, channel)                    numericReply("331", target, channel + " :No topic is set")
 #define RPL_TOPIC(target, channel, topic)               numericReply("332", target, channel + " :" + topic)
 #define RPL_INVITING(target, nickname, channel)         numericReply("341", target, nickname + " " + channel)
@@ -41,6 +43,7 @@
 #define ERR_NEEDMOREPARAMS(target, command)             numericReply("461", target, command + " :Not enough parameters")
 #define ERR_ALREADYREGISTERED(target)                   numericReply("462", target, ":You may not reregister")
 #define ERR_CHANNELISFULL(target, channel)              numericReply("471", target, channel + " :Cannot join channel, already at max capacity")
+#define ERR_UNKNOWNMODE(target, mode)                   numericReply("472", target, mode + " :is unknown mode char or has a invalid argument related")
 #define ERR_INVITEONLYCHAN(target, channel)             numericReply("473", target, channel + " :Cannot join channel, invite needed")
 #define ERR_BADCHANNELKEY(target, channel)              numericReply("475", target, channel + " :Cannot join channel, valid password needed")
 #define ERR_CHANOPRIVSNEEDED(target, channel)           numericReply("482", target, channel + " :You're not channel operator")

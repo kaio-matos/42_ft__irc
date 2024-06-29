@@ -23,7 +23,7 @@ std::string TOPIC(std::vector<std::string> args,
 
   // caso achar usaremos a referencia do canal
   Channel<sockaddr_in> &channelRef = *channel;
-  if (!channelRef.isClientInChannel(*client))
+  if (!channelRef.isClientInChannel(client))
     return (ERR_NOTONCHANNEL(nick, channelName));
 
   // prosseguindo, verificar se o comando foi chamado para mostrar o topico
@@ -38,7 +38,7 @@ std::string TOPIC(std::vector<std::string> args,
   }
 
   // verificar se eh operador e se o canal requer permissao
-  if (channelRef.isOperator(*client) && !channelRef.isTopicOPOnly())
+  if (channelRef.isOperator(client) && !channelRef.isTopicOPOnly())
     return (ERR_CHANOPRIVSNEEDED(nick, channelName));
 
   // Definir o novo topico
@@ -48,5 +48,5 @@ std::string TOPIC(std::vector<std::string> args,
   // notificar os clients do canal sobre a mudanca
   channelRef.broadcast(*client, MSG_TOPIC(nick, user, channelName, newTopic));
 
-  return "";
+  return MSG_TOPIC(nick, user, channelName, newTopic);
 }
