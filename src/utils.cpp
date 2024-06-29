@@ -1,23 +1,5 @@
 #include <ft_irc.hpp>
 
-// TODO: fix this
-std::string readfd(int fd) {
-  std::string result;
-  char buff[100];
-  int bytes = read(fd, buff, 100);
-  while (bytes) {
-    buff[bytes] = '\0';
-    std::cout << "bytes " << bytes << " buff " << buff << std::endl;
-    if (bytes < 100) {
-      result.append(buff);
-      bytes = 0;
-    } else {
-      bytes = read(fd, buff, 100);
-    }
-  }
-  return result;
-}
-
 unsigned int stringAddressToBytes(std::string str) {
   int a, b, c, d;
   char arr[4];
@@ -47,15 +29,13 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value) {
     sockaddr_in addr = value.getRawAddr();
     os << "\tPort:                 " << ntohs(addr.sin_port) << "\n";
   } catch (const std::exception &e) {
-    os << "\tPort:                 "
-       << "unavailable\n";
+    os << "\tPort:                 " << "unavailable\n";
   }
   try {
     sockaddr_in addr = value.getRawAddr();
     os << "\tAddress:              " << getAddressFromSockAddrin(addr) << "\n";
   } catch (const std::exception &e) {
-    os << "\tAddress:              "
-       << "unavailable\n";
+    os << "\tAddress:              " << "unavailable\n";
   }
   os << "\tIs Writable:          " << value.isWritable() << "\n"
      << "\tLast Pending Message: "

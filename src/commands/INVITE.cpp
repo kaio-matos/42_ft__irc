@@ -33,7 +33,7 @@ std::string INVITE(std::vector<std::string> args,
         nickname); // TODO: Check if we can use this error for this command
   }
 
-  if (to_channel->isOperator(*from) && to_channel->isInviteOnly()) {
+  if (to_channel->isOperator(from) && to_channel->isInviteOnly()) {
     return ERR_CHANOPRIVSNEEDED(from->user.nickname,
                                 to_channel->getChannelName());
   }

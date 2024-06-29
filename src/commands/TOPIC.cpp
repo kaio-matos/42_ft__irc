@@ -38,7 +38,7 @@ std::string TOPIC(std::vector<std::string> args,
   }
 
   // verificar se eh operador e se o canal requer permissao
-  if (channelRef.isOperator(client) && !channelRef.isTopicOPOnly())
+  if (!channelRef.isOperator(client) && channelRef.isTopicOPOnly())
     return (ERR_CHANOPRIVSNEEDED(nick, channelName));
 
   // Definir o novo topico

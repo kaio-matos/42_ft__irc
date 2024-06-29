@@ -183,7 +183,7 @@ public:
     std::string modes = "+";
     std::string modeParams = "";
 
-    if (this->getIsInviteOnly())
+    if (this->isInviteOnly())
       modes += 'i';
 
     if (this->isTopicOPOnly())

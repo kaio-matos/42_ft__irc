@@ -118,10 +118,11 @@ std::string MODE(std::vector<std::string> args,
 
       replyParams += modesParams[paramPosition] + " ";
 
-      if (true) {
+      if (action) {
         channelRef.setPasswd(action, modesParams[paramPosition++]);
-      } else
-        channelRef.setPasswd(action, NULL);
+      } else {
+        channelRef.setPasswd(action, modesParams[paramPosition++]);
+      }
 
       reply += 'k';
 
@@ -132,7 +133,7 @@ std::string MODE(std::vector<std::string> args,
 
       replyParams += modesParams[paramPosition] + " ";
 
-      if (true) {
+      if (action) {
         if (!hasOnlyDigits(modesParams[paramPosition].c_str()) ||
             std::atoi(modesParams[paramPosition].c_str()) <= 0) {
           return (ERR_UNKNOWNMODE(nick, 'l'));
@@ -157,7 +158,7 @@ std::string MODE(std::vector<std::string> args,
       if (client == channelRef.getClient(modesParams[paramPosition]))
         return (ERR_UNKNOWNMODE(nick, 'o'));
 
-      if (true) {
+      if (action) {
         channelRef.addOperator(
             channelRef.getClient(modesParams[paramPosition++]));
       } else if (channelRef.isOperator(
