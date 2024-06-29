@@ -57,7 +57,7 @@ std::string JOIN(std::vector<std::string> args,
       continue;
     }
 
-    if (channel->isClientInChannel(*client))
+    if (channel->isClientInChannel(client))
       continue;
     if (!channelKey.empty() && channel->getPasswd() != channelKey) {
       reply += ERR_BADCHANNELKEY(nick, channelName);

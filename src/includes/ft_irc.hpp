@@ -33,7 +33,6 @@
   static_cast<std::ostringstream &>((std::ostringstream() << std::dec << x))   \
       .str()
 
-std::string readfd(int fd);
 unsigned int stringAddressToBytes(std::string str);
 std::string getAddressFromSockAddrin(const struct sockaddr_in addr);
 std::string readFile(std::string filename, char separator);
