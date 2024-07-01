@@ -55,6 +55,9 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   if (command == "QUIT")
     return QUIT(args, from_socket, irc);
 
+  if (command == "PING")
+    return PING(args, from_socket, irc);
+
   DebugLog << "---------------------------------------------";
   return "";
 }

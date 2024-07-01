@@ -107,4 +107,7 @@ std::string JOIN(std::vector<std::string> args,
 std::string QUIT(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
+std::string PING(std::vector<std::string> args,
+                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
 #endif
