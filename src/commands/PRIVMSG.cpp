@@ -40,9 +40,9 @@ std::string PRIVMSG(std::vector<std::string> args,
   }
 
   if (target_channel) {
-    target_channel->broadcast(*from,
-                              MSG(from->user.nickname + " PRIVMSG " +
-                                  target_channel->getTopic() + " " + message));
+    target_channel->broadcast(
+        *from, MSG_PRIVMSG(from->user.nickname,
+                           target_channel->getChannelName(), message));
     return "";
   }
 
@@ -52,9 +52,8 @@ std::string PRIVMSG(std::vector<std::string> args,
                       target_client->awayMessage);
     }
 
-    target_client->socket.write(MSG(from->user.nickname + " PRIVMSG " +
-                                    target_client->user.nickname + " " +
-                                    message));
+    target_client->socket.write(MSG_PRIVMSG(
+        from->user.nickname, target_client->user.nickname, message));
     return "";
   }
 
