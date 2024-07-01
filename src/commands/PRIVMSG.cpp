@@ -36,7 +36,7 @@ std::string PRIVMSG(std::vector<std::string> args,
 
   if (false) { // TODO:
     return ERR_CANNOTSENDTOCHAN(from->user.nickname,
-                                target_channel->getTopic());
+                                target_channel->getChannelName());
   }
 
   if (target_channel) {
