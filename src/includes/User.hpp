@@ -19,6 +19,7 @@ public:
   std::string nickname;
   std::string username;
   std::string host;
+  bool logged;
 };
 
 std::ostream &operator<<(std::ostream &os, const User &value);

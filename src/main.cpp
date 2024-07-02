@@ -9,6 +9,28 @@ void sigpipe_handler(int s) {
   exit(1);
 }
 
+static bool parseArguments(int argc, char **argv, ClientArgs &args) {
+  int port;
+  std::stringstream ss;
+
+  if (argc != 3) {
+    std::cerr << "Error: missing arguments." << std::endl;
+    return (false);
+  }
+  ss.str(argv[1]);
+  if (!(ss >> port) || ss.fail() || !ss.eof()) {
+    std::cerr << "Error: invalid argument: " << argv[1] << std::endl;
+    return (false);
+  }
+  args.port = port;
+  if (std::strlen(argv[2]) < 1) {
+    std::cerr << "Error: invalid argument: " << argv[2] << std::endl;
+    return (false);
+  }
+  args.password = std::string(argv[2]);
+  return (true);
+}
+
 template <typename T>
 std::string onRequest(std::string request, Socket<T> &from_socket,
                       IRC<T> &irc) {
@@ -58,13 +80,24 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   if (command == "PART")
     return PART(args, from_socket, irc);
 
+  if (command == "PASS")
+    return PART(args, from_socket, irc);
+
   DebugLog << "---------------------------------------------";
   return "";
 }
 
 template <typename T> void sendResponse(Socket<T> &to_socket, IRC<T> &irc) {}
 
-int main() {
+int main(int argc, char **argv) {
+
+  ClientArgs clientArgs;
+
+  if (!parseArguments(argc, argv, clientArgs)) {
+    std::cerr << "Usage: " << argv[0] << " PORT PASSWORD" << std::endl;
+    return (1);
+  }
+
   DebugLog << BOLDCYAN
            << "-------------------------- Starting ft_irc "
               "--------------------------";
@@ -76,13 +109,13 @@ int main() {
 
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = stringAddressToBytes("0.0.0.0");
-  addr.sin_port = htons(8080);
+  addr.sin_port = htons(clientArgs.port);
 
   tcp_socket.bind(addr);
   tcp_socket.listen(5);
 
   DebugLog << "Listening on:\n" << tcp_socket;
-  IRC<sockaddr_in> irc;
+  IRC<sockaddr_in> irc(clientArgs);
 
   tcp_socket.poll(onRequest, sendResponse, irc, "\n");
 
