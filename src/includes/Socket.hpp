@@ -170,12 +170,8 @@ public:
       throw std::runtime_error("Error while trying to accept a request ");
     }
 
-    // TODO: check if is necessary to set the accepted socket as reusable and
-    // non-blocking
-    //
-    // _setSocketAsReusable(cfd);
-    // _setSocketAsNonBlocking(cfd);
-    DebugLog << "New client accepted with fd [" << cfd << "]";
+    _setSocketAsNonBlocking(cfd);
+    DebugLog << BOLDGREEN << "New client accepted with fd [" << cfd << "]";
     peer_socket->_fd = cfd;
     _sockets.push_back(peer_socket);
   }
@@ -185,16 +181,14 @@ public:
             void (*sendResponse)(Socket<T> &, Arg &), Arg &argument,
             std::string eof) {
     while (1) {
-      int num_fds = _sockets.size();
-      struct pollfd poll_fds[num_fds];
-      int timeout = (5 * 60 * 1000); // 5 minutes (in milliseconds)
+      std::vector<pollfd> fds;
+      int timeout_ms = (5 * 60 * 1000);
 
-      for (int i = 0; i < num_fds; i++) {
-        poll_fds[i].fd = _sockets[i]->getFd();
-        poll_fds[i].events = POLLIN | POLLOUT;
+      for (int i = 0; i < _sockets.size(); i++) {
+        fds.push_back((pollfd){.fd = _sockets[i]->getFd(), .events = POLLIN});
       }
 
-      int ret = ::poll(poll_fds, num_fds, timeout);
+      int ret = ::poll(fds.data(), fds.size(), timeout_ms);
       if (ret < 0) {
         throw std::runtime_error("poll error");
       } else if (ret == 0) {
@@ -202,19 +196,18 @@ public:
         continue;
       }
 
-      for (int i = 0; i < num_fds; i++) {
+      for (int i = 0; i < fds.size(); i++) {
         Socket<struct sockaddr_in> *peer_socket;
 
-        bool canWrite = poll_fds[i].revents & POLLOUT;
-        bool canRead = poll_fds[i].revents & POLLIN;
+        bool canWrite = fds[i].revents & POLLOUT;
+        bool canRead = fds[i].revents & POLLIN;
 
         if (*this == *_sockets[i]) {
           if (canRead) {
             peer_socket = new Socket<struct sockaddr_in>();
             accept(peer_socket);
-          } else {
-            continue;
           }
+          continue;
         } else {
           peer_socket = _sockets[i];
         }
