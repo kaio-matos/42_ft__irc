@@ -4,6 +4,8 @@
 
 class User {
 public:
+  User(void);
+
   User(std::string nickname, std::string username);
 
   User(const User &value);
@@ -19,7 +21,6 @@ public:
   std::string nickname;
   std::string username;
   std::string host;
-  bool logged;
 };
 
 std::ostream &operator<<(std::ostream &os, const User &value);

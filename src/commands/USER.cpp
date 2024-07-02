@@ -3,6 +3,10 @@
 
 std::string USER(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
+  if (!from_socket._logged) {
+    return ERR_NOTREGISTERED;
+  }
+
   if (args.size() != 4) {
     return ERR_NEEDMOREPARAMS("User", "USER");
   }

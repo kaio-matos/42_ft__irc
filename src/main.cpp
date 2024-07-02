@@ -81,7 +81,7 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
     return PART(args, from_socket, irc);
 
   if (command == "PASS")
-    return PART(args, from_socket, irc);
+    return PASS(args, from_socket, irc);
 
   DebugLog << "---------------------------------------------";
   return "";
