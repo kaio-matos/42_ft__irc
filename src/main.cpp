@@ -1,9 +1,6 @@
 #include <ft_irc.hpp>
 
-void ctrl_c_handler(int s) {
-  Socket<sockaddr_in>::cleanup();
-  exit(0);
-}
+void ctrl_c_handler(int s) { Socket<sockaddr_in>::cleanup(); }
 
 void sigpipe_handler(int s) {
   // TODO: handle with broken pipes (if the client connection is closed

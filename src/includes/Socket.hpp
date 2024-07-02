@@ -131,7 +131,7 @@ public:
   void close(void) {
     if (_fd != -1) {
       if (::close(_fd) == -1) {
-        throw std::runtime_error("Error while closing the socket ");
+        Socket::_isServerRunning = false;
       }
     }
   }
@@ -180,7 +180,8 @@ public:
   void poll(std::string (*onRequest)(std::string, Socket<T> &, Arg &),
             void (*sendResponse)(Socket<T> &, Arg &), Arg &argument,
             std::string eof) {
-    while (1) {
+    Socket::_isServerRunning = true;
+    while (_isServerRunning) {
       std::vector<pollfd> fds;
       int timeout_ms = (5 * 60 * 1000);
 
@@ -191,7 +192,8 @@ public:
 
       int ret = ::poll(fds.data(), fds.size(), timeout_ms);
       if (ret < 0) {
-        throw std::runtime_error("poll error");
+        Socket::_isServerRunning = false;
+        continue;
       } else if (ret == 0) {
         DebugLog << BOLDBLUE << "Poll timed out";
         continue;
@@ -228,22 +230,10 @@ public:
         }
       }
     }
+    Socket::_cleanup();
   }
 
-  static void cleanup() {
-    typename std::vector<Socket<T> *>::iterator it;
-
-    for (it = Socket::_sockets.begin(); it != Socket::_sockets.end(); it++) {
-      Socket<T> *socket = *it;
-      socket->close();
-      if (!socket->isServer()) { // work around because the server socket is
-        // not allocated, so we cant delete it
-        delete socket;
-      }
-    }
-
-    Socket::_sockets.clear();
-  }
+  static void cleanup() { Socket::_isServerRunning = false; }
 
   bool isEmpty() const { return (_fd == -1 && _addr == NULL); }
   bool isOpen() const { return _isOpen; }
@@ -269,6 +259,7 @@ public:
 
 private:
   static std::vector<Socket<T> *> _sockets;
+  static bool _isServerRunning;
   std::queue<std::string> _pendingMessagesToWrite;
 
   int _fd;
@@ -309,8 +300,24 @@ private:
       _pendingMessagesToWrite.pop();
     }
   }
+
+  void _cleanup() {
+    typename std::vector<Socket<T> *>::iterator it;
+
+    for (it = Socket::_sockets.begin(); it != Socket::_sockets.end(); it++) {
+      Socket<T> *socket = *it;
+      socket->close();
+      if (!socket->isServer()) { // work around because the server socket is
+        // not allocated, so we cant delete it
+        delete socket;
+      }
+    }
+
+    Socket::_sockets.clear();
+  }
 };
 template <typename T>
 std::vector<Socket<T> *> Socket<T>::_sockets = std::vector<Socket<T> *>();
+template <typename T> bool Socket<T>::_isServerRunning = false;
 
 #endif
