@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <cctype>
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
@@ -41,6 +42,7 @@ std::string replaceAll(std::string str, const std::string &from,
 
 std::vector<std::string> split(std::string str);
 std::vector<std::string> splitByComma(const std::string &data);
+std::string trim(std::string s);
 
 template <typename T> class Socket;
 std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
@@ -108,6 +110,9 @@ std::string QUIT(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
 std::string PING(std::vector<std::string> args,
+                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
+std::string PART(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
 #endif

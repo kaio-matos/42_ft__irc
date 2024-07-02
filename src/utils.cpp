@@ -29,13 +29,15 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value) {
     sockaddr_in addr = value.getRawAddr();
     os << "\tPort:                 " << ntohs(addr.sin_port) << "\n";
   } catch (const std::exception &e) {
-    os << "\tPort:                 " << "unavailable\n";
+    os << "\tPort:                 "
+       << "unavailable\n";
   }
   try {
     sockaddr_in addr = value.getRawAddr();
     os << "\tAddress:              " << getAddressFromSockAddrin(addr) << "\n";
   } catch (const std::exception &e) {
-    os << "\tAddress:              " << "unavailable\n";
+    os << "\tAddress:              "
+       << "unavailable\n";
   }
   os << "\tIs Writable:          " << value.isWritable() << "\n"
      << "\tLast Pending Message: "
@@ -73,10 +75,10 @@ std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value) {
      << "\tClients: ";
 
   for (; it != value.getClients().end(); it++) {
-    os << it->second << ", ";
+    os << *it->second << ", ";
   }
-  os << "\t]\n";
-  os << "}\n";
+  os << "\t]\n"
+     << "}\n";
   return os;
 }
 
@@ -156,4 +158,12 @@ std::vector<std::string> splitByComma(const std::string &data) {
     tokens.push_back(token);
   }
   return (tokens);
+}
+
+std::string trim(std::string s) {
+  std::string spaces = " \t\n\v\f\r";
+
+  s.erase(s.find_last_not_of(spaces) + 1);
+  s.erase(0, s.find_first_not_of(spaces));
+  return s;
 }
