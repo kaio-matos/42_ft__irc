@@ -1,5 +1,6 @@
 objects/*/**
 ft_irc
+ircserv
 *.o
 compile_commands.json
 .cache/*/**

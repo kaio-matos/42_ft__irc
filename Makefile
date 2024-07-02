@@ -1,5 +1,5 @@
 
-NAME		= ft_irc
+NAME		= ircserv
 
 OBJS_DIR	= objects
 SRC_DIR		= src

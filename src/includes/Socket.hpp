@@ -185,7 +185,8 @@ public:
       int timeout_ms = (5 * 60 * 1000);
 
       for (int i = 0; i < _sockets.size(); i++) {
-        fds.push_back((pollfd){.fd = _sockets[i]->getFd(), .events = POLLIN});
+        fds.push_back(
+            (pollfd){.fd = _sockets[i]->getFd(), .events = POLLOUT | POLLIN});
       }
 
       int ret = ::poll(fds.data(), fds.size(), timeout_ms);
