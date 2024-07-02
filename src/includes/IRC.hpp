@@ -62,13 +62,11 @@ public:
   }
 
   Channel<T> *getChannel(std::string name) {
-    typename std::map<std::string, Channel<T> *>::iterator it =
-        channels.find(name);
-
-    if (it != channels.end()) {
-      return it->second;
+    try {
+      return channels.at(name);
+    } catch (const std::exception &error) {
+      return NULL;
     }
-    return NULL;
   }
 
   void disconnectClient(Client<T> &client) {

@@ -40,6 +40,11 @@ std::string PRIVMSG(std::vector<std::string> args,
   }
 
   if (target_channel) {
+    if (!target_channel->getClient(from->socket)) {
+      return ERR_NOTONCHANNEL(from->user.nickname,
+                              target_channel->getChannelName());
+    }
+
     target_channel->broadcast(
         *from, MSG_PRIVMSG(from->user.nickname,
                            target_channel->getChannelName(), message));

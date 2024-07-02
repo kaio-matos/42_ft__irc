@@ -11,7 +11,7 @@ public:
   Channel(std::string channelName)
       : _channelName(channelName), _operatorTopicOnly(false), _hasPasswd(false),
         _userLimit(-1), _hasUserlimit(false), _isInviteOnly(false),
-        _clients(Channel::map()), _operators(Channel::map()) {}
+        _clients(Channel::map()), _operators(Channel::map()), _topic("") {}
 
   Channel(const Channel &value)
       : _channelName(value._channelName), _topic(value._topic),
@@ -26,7 +26,7 @@ public:
       _channelName = value._channelName;
       _clients = value._clients;
       _operators = value._operators;
-      _topic = value.getTopic();
+      _topic = value._topic;
       _operatorTopicOnly = value._operatorTopicOnly;
       _passwd = value._passwd;
       _hasPasswd = value._hasPasswd;
@@ -51,6 +51,9 @@ public:
 
     for (it = _clients.begin(); it != _clients.end(); ++it) {
       if (*it->second == client) {
+        if (isOperator(it->second)) {
+          removeOperator(it->second);
+        }
         _clients.erase(it);
         return true;
       }

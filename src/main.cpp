@@ -22,7 +22,7 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
 
   request.erase(std::remove(request.begin(), request.end(), '\n'),
                 request.end());
-  std::vector<std::string> args = split(request);
+  std::vector<std::string> args = split(trim(request));
   std::string command = args[0];
   args.erase(args.begin());
   if (command == "USER")
@@ -57,6 +57,9 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
 
   if (command == "PING")
     return PING(args, from_socket, irc);
+
+  if (command == "PART")
+    return PART(args, from_socket, irc);
 
   DebugLog << "---------------------------------------------";
   return "";

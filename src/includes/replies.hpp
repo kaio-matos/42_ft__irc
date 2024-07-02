@@ -16,6 +16,7 @@
 #define MSG_PRIVMSG(nick, channel_or_nick, message)     std::string(":" + nick + " PRIVMSG " + channel_or_nick + " " + message + "\r\n")
 #define MSG_INVITE(identity, nick, channel)             std::string(":" + identity + " INVITE " + nick + " " + channel + "\r\n")
 #define MSG_PONG(server, token)                         std::string(std::string("PONG ") + server + " " + token + "\r\n")
+#define MSG_PART(identity, channel)                     std::string(":" + identity + " PART " + channel + "\r\n")
 
 //numeric replies  
 #define RPL_WELCOME(target, nickname, username)         numericReply("001", target, ":Welcome to the " + SERVER_NAME + " Network, " + nickname + "[!" + username + "@*]")
