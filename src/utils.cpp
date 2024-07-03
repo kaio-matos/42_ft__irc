@@ -130,9 +130,8 @@ std::string replaceAll(std::string str, const std::string &from,
   return str;
 }
 
-std::vector<std::string> split(std::string str) {
+std::vector<std::string> split(std::string str, std::string del) {
   std::vector<std::string> splitted;
-  std::string del = " ";
   size_t pos = str.find(del);
 
   std::string token;

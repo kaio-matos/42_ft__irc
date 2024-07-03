@@ -41,7 +41,7 @@ std::string readFile(std::string filename, char separator);
 std::string replaceAll(std::string str, const std::string &from,
                        const std::string &to);
 
-std::vector<std::string> split(std::string str);
+std::vector<std::string> split(std::string str, std::string del = " ");
 std::vector<std::string> splitByComma(const std::string &data);
 std::string trim(std::string s);
 

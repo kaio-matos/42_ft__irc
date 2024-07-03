@@ -226,8 +226,12 @@ public:
 
         if (canRead) {
           std::string request = peer_socket->read(eof);
-          std::string response = onRequest(request, *peer_socket, argument);
-          peer_socket->write(response);
+          std::vector<std::string> commands = split(request, "\r\n");
+          for (int j = 0; j < commands.size(); j++) {
+            std::string response =
+                onRequest(commands[j], *peer_socket, argument);
+            peer_socket->write(response);
+          }
         }
       }
     }
