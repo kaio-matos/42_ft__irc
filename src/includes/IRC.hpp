@@ -8,6 +8,12 @@ public:
   // IRC(std::map<int, Client<T> > clients,
   //     std::map<std::string, Channel<T> > channels)
   //     : clients(clients), channels(channels){};
+
+  IRC(const ClientArgs args) {
+    this->clientArgs.password = args.password;
+    this->clientArgs.port = args.port;
+  }
+
   IRC(const IRC &value) : clients(value.clients), channels(value.channels){};
   IRC &operator=(const IRC &value) {
     if (this != &value) {
@@ -92,5 +98,6 @@ public:
 
   std::map<int, Client<T> *> clients;
   std::map<std::string, Channel<T> *> channels;
+  ClientArgs clientArgs;
 };
 #endif

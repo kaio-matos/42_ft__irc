@@ -45,6 +45,7 @@
 #define ERR_NOTREGISTERED                               numericReply("451", "User", ":You have not registered")
 #define ERR_NEEDMOREPARAMS(target, command)             numericReply("461", target, command + " :Not enough parameters")
 #define ERR_ALREADYREGISTERED(target)                   numericReply("462", target, ":You may not reregister")
+#define ERR_PASSWSMISMATCH(target)                      numericReply("464", target, ":Password Incorrect")
 #define ERR_CHANNELISFULL(target, channel)              numericReply("471", target, channel + " :Cannot join channel, already at max capacity")
 #define ERR_UNKNOWNMODE(target, mode)                   numericReply("472", target, mode + " :is unknown mode char or has a invalid argument related")
 #define ERR_INVITEONLYCHAN(target, channel)             numericReply("473", target, channel + " :Cannot join channel, invite needed")

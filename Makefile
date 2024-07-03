@@ -50,7 +50,7 @@ debug/generate-lsp-config:
 
 .PHONY: debug/run
 debug/run: re
-	./$(NAME)
+	./$(NAME) 8080 teste
 
 .PHONY: debug/valgrind
 debug/valgrind: re

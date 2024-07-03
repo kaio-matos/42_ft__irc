@@ -9,7 +9,7 @@ std::string JOIN(std::vector<std::string> args,
   // ClientIterator client_it = irc.clients.find(from_socket.getFd());
 
   Client<sockaddr_in> *client = irc.getClient(from_socket.getFd());
-  if (!client) {
+  if (!client || !from_socket._logged) {
     return ERR_NOTREGISTERED;
   }
   std::string nick = client->user.nickname;

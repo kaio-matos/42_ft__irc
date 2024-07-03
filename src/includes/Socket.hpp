@@ -12,6 +12,7 @@ public:
     _addr = NULL;
     _pendingMessagesToWrite = std::queue<std::string>();
 
+    _logged = false;
     _isOpen = false;
     _isListener = false;
     _isClosed = false;
@@ -256,6 +257,7 @@ public:
       throw std::runtime_error("Addr not available");
     return *_addr;
   }
+  bool _logged;
 
 private:
   static std::vector<Socket<T> *> _sockets;

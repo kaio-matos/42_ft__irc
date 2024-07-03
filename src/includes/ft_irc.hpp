@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
@@ -71,6 +72,8 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 
 #include <Socket.hpp>
 
+#include <ClientArgs.hpp>
+
 #include <Client.hpp>
 
 #include <Channel.hpp>
@@ -113,6 +116,9 @@ std::string PING(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
 std::string PART(std::vector<std::string> args,
+                 Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
+
+std::string PASS(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
 #endif
