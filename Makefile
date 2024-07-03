@@ -54,6 +54,6 @@ debug/run: re
 
 .PHONY: debug/valgrind
 debug/valgrind: re
-	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME) 
+	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME) 8080 teste
 
 

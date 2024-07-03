@@ -1,40 +1,22 @@
-import net from "node:net";
-import { exit } from "node:process";
+import { CreateClient, SUCCESS } from "./tools.mjs";
 
-setTimeout(() => exit(), 1000);
+const kaio = await CreateClient("kaio", "kaio");
+const john = await CreateClient("john", "john");
 
-const cKaio = net.createConnection(
-  { localAddress: "0.0.0.0", port: 8080 },
-  function onConnect() {
-    cKaio.write("USER kaio * 0 kaio\n", () => cKaio.write("JOIN #games\n"));
+await kaio.send("JOIN #games");
 
-    cKaio.on("data", (buffer) => {
-      const response = buffer.toString();
+kaio.connection.on("data", (buffer) => {
+  const response = buffer.toString();
 
-      if (
-        response.toLowerCase().includes("new user john has entered the channel")
-      ) {
-        cKaio.write("KICK john #games\n");
-      }
+  if (
+    response.toLowerCase().includes("new user john has entered the channel")
+  ) {
+    kaio.send("KICK john #games\n");
+  }
 
-      if (response.toLowerCase().includes("john got kicked")) {
-        console.log("SUCCESS");
-        cKaio.end();
-        cJohn.end();
-      }
-    });
-  },
-);
+  if (response.toLowerCase().includes("john got kicked")) {
+    SUCCESS();
+  }
+});
 
-await new Promise((res) => setTimeout(res, 500));
-
-const cJohn = net.createConnection(
-  { localAddress: "0.0.0.0", port: 8080 },
-  async function onConnect() {
-    cJohn.write("USER john * 0 john\n", () => cJohn.write("JOIN #games\n"));
-
-    cJohn.on("data", (buffer) => {
-      const response = buffer.toString();
-    });
-  },
-);
+await john.send("JOIN #games");

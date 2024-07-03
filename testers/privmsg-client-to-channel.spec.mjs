@@ -1,35 +1,18 @@
-import net from "node:net";
-import { exit } from "node:process";
+import { CreateClient, SUCCESS } from "./tools.mjs";
 
-setTimeout(() => exit(), 1000);
+const kaio = await CreateClient("kaio", "kaio");
+const john = await CreateClient("john", "john");
+await kaio.send("JOIN #games");
+await john.send("JOIN #games");
 
 const messageSent = "Hello are you ALL receiving this message?";
 
-const cKaio = net.createConnection(
-  { localAddress: "0.0.0.0", port: 8080 },
-  function onConnect() {
-    cKaio.write("USER kaio * 0 kaio\n", () => cKaio.write("JOIN #games\n"));
-    cKaio.on("data", (buffer) => {
-      const response = buffer.toString();
-    });
-  },
-);
+john.connection.on("data", (buffer) => {
+  const response = buffer.toString();
 
-const cJohn = net.createConnection(
-  { localAddress: "0.0.0.0", port: 8080 },
-  function onConnect() {
-    cJohn.write("USER john * 0 john\n", () => {
-      cJohn.write("JOIN #games\n", () =>
-        cKaio.write("PRIVMSG #games :" + messageSent + "\n"),
-      );
-    });
+  if (response.includes(messageSent)) {
+    SUCCESS();
+  }
+});
 
-    cJohn.on("data", (buffer) => {
-      const response = buffer.toString();
-
-      if (response.includes(messageSent)) {
-        console.log("SUCCESS");
-      }
-    });
-  },
-);
+await kaio.send("PRIVMSG #games :" + messageSent);
