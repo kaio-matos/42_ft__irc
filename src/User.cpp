@@ -4,12 +4,13 @@ User::User(std::string nickname, std::string username)
     : username(username), nickname(nickname), host("ft.irc") {}
 
 User::User(const User &value)
-    : username(value.username), nickname(value.nickname) {}
+    : username(value.username), nickname(value.nickname), host(value.host) {}
 
 User &User::operator=(const User &value) {
   if (this != &value) {
     nickname = value.nickname;
     username = value.username;
+    host = value.host;
   }
   return *this;
 }
@@ -20,4 +21,4 @@ bool User::operator==(const User &value) const {
 
 User::~User(void) {}
 
-std::string User::identity() { return nickname + "!~" + username + "@" + host; }
+std::string User::identity() { return nickname + "!" + username + "@" + host; }
