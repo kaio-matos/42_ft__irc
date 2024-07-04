@@ -13,7 +13,13 @@ std::string PART(std::vector<std::string> args,
   }
 
   std::vector<std::string> channels = splitByComma(args[0]);
-  std::string reason = args[1];
+  std::string reason;
+
+  for (int i = 1; i < args.size(); i++) {
+    if (i != 1)
+      reason.append(" ");
+    reason.append(args[i]);
+  }
 
   for (std::vector<std::string>::iterator it = channels.begin();
        it != channels.end(); it++) {
@@ -37,8 +43,17 @@ std::string PART(std::vector<std::string> args,
 
     channel->disconnectClient(*from);
 
-    from->socket.write(
-        MSG_PART(from->user.identity(), channel->getChannelName()));
+    std::string message;
+    if (reason.empty()) {
+      message = MSG_PART(from->user.identity(), channel->getChannelName());
+      channel->broadcast(message);
+      from->socket.write(message);
+    } else {
+      message = MSG_PARTREASON(from->user.identity(), channel->getChannelName(),
+                               reason);
+      channel->broadcast(message);
+      from->socket.write(message);
+    }
   }
 
   return "";

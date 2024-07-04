@@ -18,10 +18,11 @@ std::string PRIVMSG(std::vector<std::string> args,
   }
 
   std::string target_nickname_or_channel = args[0];
-  std::string message = args[1];
+  std::string message;
 
-  for (int i = 2; i < args.size(); i++) {
-    message.append(" ");
+  for (int i = 1; i < args.size(); i++) {
+    if (i != 1)
+      message.append(" ");
     message.append(args[i]);
   }
 
