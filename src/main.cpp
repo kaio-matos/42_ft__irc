@@ -65,9 +65,6 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   if (command == "MODE")
     return MODE(args, from_socket, irc);
 
-  if (command == "BROADCAST")
-    return BROADCAST(args, from_socket, irc);
-
   if (command == "PRIVMSG")
     return PRIVMSG(args, from_socket, irc);
 

@@ -82,9 +82,6 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 
 #include <replies.hpp>
 
-std::string BROADCAST(std::vector<std::string> args,
-                      Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
-
 std::string INVITE(std::vector<std::string> args,
                    Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc);
 
