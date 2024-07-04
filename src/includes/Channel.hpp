@@ -65,8 +65,7 @@ public:
     typename map::iterator it = _clients.begin();
     for (it; it != _clients.end(); it++) {
       if (exclude != *it->second) {
-        it->second->socket.write(SSTR(it->second->socket.getFd()) + " " +
-                                 message);
+        it->second->socket.write(message);
       }
     }
   };
@@ -74,8 +73,7 @@ public:
   void broadcast(std::string message) {
     typename map::iterator it = _clients.begin();
     for (it; it != _clients.end(); it++) {
-      it->second->socket.write(SSTR(it->second->socket.getFd()) + " " +
-                               message);
+      it->second->socket.write(message);
     }
   };
 
