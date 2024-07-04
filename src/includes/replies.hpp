@@ -23,7 +23,6 @@
 #define RPL_YOURHOST(target, servername, version)       numericReply("002", target, ":Your host is " + servername + ", running version " + version)
 #define RPL_CREATED(target)                             numericReply("003", target, ":This server was created " + SERVER_CREATED_AT)
 #define RPL_MYINFO(target)                              numericReply("004", target, SERVER_NAME + " " + SERVER_VERSION +  " " + SERVER_USER_MODES + " " + SERVER_CHANNEL_MODES)
-#define RPL_AWAY(target, nickname, message)             numericReply("301", target, nickname + " :" + message)
 #define RPL_CHANNELMODEIS(target, channel, modes)       numericReply("324", target, channel + modes)
 #define RPL_NOTOPIC(target, channel)                    numericReply("331", target, channel + " :No topic is set")
 #define RPL_TOPIC(target, channel, topic)               numericReply("332", target, channel + " :" + topic)

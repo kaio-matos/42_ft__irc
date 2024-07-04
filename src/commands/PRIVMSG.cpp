@@ -52,11 +52,6 @@ std::string PRIVMSG(std::vector<std::string> args,
   }
 
   if (target_client) {
-    if (false) { // TODO:
-      return RPL_AWAY(from->user.nickname, target_client->user.nickname,
-                      target_client->awayMessage);
-    }
-
     target_client->socket.write(MSG_PRIVMSG(
         from->user.nickname, target_client->user.nickname, message));
     return "";

@@ -8,15 +8,13 @@ public:
 
   Client(const Client &value)
       : user(value.user), socket(value.socket),
-        _pendingInvites(value._pendingInvites),
-        awayMessage(value.awayMessage){};
+        _pendingInvites(value._pendingInvites){};
 
   Client &operator=(const Client &value) {
     if (this != &value) {
       user = value.user;
       socket = value.socket;
       _pendingInvites = value._pendingInvites;
-      awayMessage = value.awayMessage;
     }
     return *this;
   };
@@ -44,7 +42,6 @@ public:
 
   User user;
   Socket<T> &socket;
-  std::string awayMessage; // TODO:
 
 private:
   std::set<std::string> _pendingInvites;
