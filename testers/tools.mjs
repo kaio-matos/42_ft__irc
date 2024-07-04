@@ -1,16 +1,11 @@
 import net from "node:net";
 import { exit } from "node:process";
 
-setTimeout(() => {
-  console.log("Timed out");
-  exit();
-}, 1500);
-
 /**
  * @param {string} nickname
  * @param {string} username
  */
-export async function CreateClient(nickname, username) {
+export async function CreateClient(nickname, username, timeout = true) {
   /** @type {import('node:net').Socket} */
   const connection = await new Promise((res) => {
     const c = net.createConnection(
@@ -21,6 +16,13 @@ export async function CreateClient(nickname, username) {
       },
     );
   });
+
+  if (timeout) {
+    setTimeout(() => {
+      console.log("Timed out");
+      exit();
+    }, 1500);
+  }
 
   return {
     connection,
