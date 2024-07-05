@@ -24,5 +24,6 @@ std::string QUIT(std::vector<std::string> args,
                                      MSG_QUIT(from->user.identity(), message));
   }
   irc.disconnectClient(*from);
+
   return "";
 }

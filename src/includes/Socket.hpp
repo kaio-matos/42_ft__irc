@@ -19,6 +19,7 @@ public:
     _isWritable = false;
     _isClient = true;
     _isServer = false;
+    _pendingRemoval = false;
   }
 
   Socket(int domain, int type, int protocol) {
@@ -35,6 +36,7 @@ public:
     _isWritable = false;
     _isClient = false;
     _isServer = true;
+    _pendingRemoval = false;
 
     _setSocketAsReusable(_fd);
     _setSocketAsNonBlocking(_fd);
@@ -63,6 +65,9 @@ public:
     _isWritable = value._isWritable;
     _isClient = value._isClient;
     _isServer = value._isServer;
+
+    _pendingRemoval = false;
+
     return *this;
   }
 
@@ -179,7 +184,8 @@ public:
 
   template <typename Arg>
   void poll(std::string (*onRequest)(std::string, Socket<T> &, Arg &),
-            void (*sendResponse)(Socket<T> &, Arg &), Arg &argument,
+            void (*sendResponse)(Socket<T> &, Arg &),
+            void (*onDisconnect)(Socket<T> &, Arg &), Arg &argument,
             std::string eof) {
     Socket::_isServerRunning = true;
     while (_isServerRunning) {
@@ -216,6 +222,11 @@ public:
           peer_socket = _sockets[i];
         }
 
+        if (peer_socket->_pendingRemoval) {
+          peer_socket->_erase();
+          continue;
+        }
+
         if (canWrite) {
           peer_socket->_isWritable = true;
           peer_socket->_flushPendingMessages();
@@ -226,6 +237,15 @@ public:
 
         if (canRead) {
           std::string request = peer_socket->read(eof);
+          bool hasDisconnected = request.empty();
+
+          if (hasDisconnected) {
+            onDisconnect(*peer_socket, argument);
+            peer_socket->erase();
+
+            continue;
+          }
+
           std::vector<std::string> commands = split(request, "\r\n");
           for (int j = 0; j < commands.size(); j++) {
             std::string response =
@@ -237,6 +257,8 @@ public:
     }
     Socket::_cleanup();
   }
+
+  void erase() { _pendingRemoval = true; };
 
   static void cleanup() { Socket::_isServerRunning = false; }
 
@@ -280,6 +302,7 @@ private:
   bool _isClient;
   bool _isServer;
   bool _isWritable;
+  bool _pendingRemoval;
 
   void _allocateAddr(void) {
     if (_addr == NULL) {
@@ -307,7 +330,19 @@ private:
     }
   }
 
-  void _cleanup() {
+  void _erase() {
+    for (typename std::vector<Socket<T> *>::iterator it = _sockets.begin();
+         it != _sockets.end(); it++) {
+      if ((*it)->getFd() == _fd) {
+        close();
+        delete *it;
+        _sockets.erase(it);
+        break;
+      }
+    }
+  }
+
+  static void _cleanup() {
     typename std::vector<Socket<T> *>::iterator it;
 
     for (it = Socket::_sockets.begin(); it != Socket::_sockets.end(); it++) {
@@ -322,6 +357,7 @@ private:
     Socket::_sockets.clear();
   }
 };
+
 template <typename T>
 std::vector<Socket<T> *> Socket<T>::_sockets = std::vector<Socket<T> *>();
 template <typename T> bool Socket<T>::_isServerRunning = false;

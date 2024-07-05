@@ -85,6 +85,8 @@ public:
         clients.find(client.socket.getFd());
     if (clientIt == clients.end())
       return;
+    client.socket.erase();
+    delete clientIt->second;
     clients.erase(clientIt);
   }
 

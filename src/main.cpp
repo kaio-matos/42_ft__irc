@@ -86,6 +86,17 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
 
 template <typename T> void sendResponse(Socket<T> &to_socket, IRC<T> &irc) {}
 
+template <typename T> void onDisconnect(Socket<T> &from_socket, IRC<T> &irc) {
+  Client<sockaddr_in> *from = irc.getClient(from_socket.getFd());
+  std::vector<std::string> args;
+
+  if (from) {
+    args.push_back(":User " + from->user.nickname + " was disconnected");
+    QUIT(args, from_socket, irc);
+    return;
+  }
+}
+
 int main(int argc, char **argv) {
 
   ClientArgs clientArgs;
@@ -114,7 +125,7 @@ int main(int argc, char **argv) {
   DebugLog << "Listening on:\n" << tcp_socket;
   IRC<sockaddr_in> irc(clientArgs);
 
-  tcp_socket.poll(onRequest, sendResponse, irc, "\n");
+  tcp_socket.poll(onRequest, sendResponse, onDisconnect, irc, "\n");
 
   tcp_socket.close();
 
