@@ -18,6 +18,7 @@
 #define MSG_PONG(server, token)                         std::string(std::string("PONG ") + server + " " + token + "\r\n")
 #define MSG_PART(identity, channel)                     std::string(":" + identity + " PART " + channel + "\r\n")
 #define MSG_PARTREASON(identity, channel, reason)       std::string(":" + identity + " PART " + channel + " " + reason + "\r\n")
+#define MSG_QUIT(identity, message)                     std::string(":" + identity + " QUIT :Quit " + message + "\r\n")
 
 //numeric replies  
 #define RPL_WELCOME(target, nickname, username)         numericReply("001", target, ":Welcome to the " + SERVER_NAME + " Network, " + nickname + "[!" + username + "@*]")

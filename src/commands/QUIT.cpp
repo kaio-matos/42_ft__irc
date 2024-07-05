@@ -8,15 +8,21 @@ std::string QUIT(std::vector<std::string> args,
     return ERR_NOTREGISTERED;
   }
 
-  std::string message = args[0];
+  std::string message;
 
-  if (message.empty()) {
-    irc.broadcast(*from, from->user.nickname + " is exiting the network");
+  for (int i = 0; i < args.size(); i++) {
+    if (i != 0)
+      message.append(" ");
+    message.append(args[i]);
   }
 
-  irc.broadcast(*from, from->user.nickname +
-                           " is exiting the network the message: \"Quit: " +
-                           message + "\"");
+  if (message.empty()) {
+    irc.broadcastToConnectedChannels(*from,
+                                     MSG_QUIT(from->user.identity(), ""));
+  } else {
+    irc.broadcastToConnectedChannels(*from,
+                                     MSG_QUIT(from->user.identity(), message));
+  }
   irc.disconnectClient(*from);
   return "";
 }

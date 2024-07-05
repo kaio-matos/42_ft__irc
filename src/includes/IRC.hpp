@@ -88,11 +88,13 @@ public:
     clients.erase(clientIt);
   }
 
-  void broadcast(Client<T> &from, std::string message) {
+  void broadcastToConnectedChannels(Client<T> &from, std::string message) {
     for (typename std::map<std::string, Channel<T> *>::iterator it =
              channels.begin();
          it != channels.end(); it++) {
-      it->second->broadcast(from, message);
+      if (it->second->isClientInChannel(&from)) {
+        it->second->broadcast(from, message);
+      }
     }
   }
 
