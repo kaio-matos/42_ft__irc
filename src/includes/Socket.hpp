@@ -16,7 +16,7 @@ public:
     _isOpen = false;
     _isListener = false;
     _isClosed = false;
-    _isWritable = false;
+    isWritable = false;
     _isClient = true;
     _isServer = false;
     _pendingRemoval = false;
@@ -33,15 +33,13 @@ public:
     _isOpen = false;
     _isListener = false;
     _isClosed = false;
-    _isWritable = false;
+    isWritable = false;
     _isClient = false;
     _isServer = true;
     _pendingRemoval = false;
 
     _setSocketAsReusable(_fd);
     _setSocketAsNonBlocking(_fd);
-
-    _sockets.push_back(this);
   }
 
   Socket(const Socket &value) { *this = value; }
@@ -62,11 +60,11 @@ public:
     _isOpen = value._isOpen;
     _isListener = value._isListener;
     _isClosed = value._isClosed;
-    _isWritable = value._isWritable;
+    isWritable = value.isWritable;
     _isClient = value._isClient;
     _isServer = value._isServer;
 
-    _pendingRemoval = false;
+    _pendingRemoval = value._pendingRemoval;
 
     return *this;
   }
@@ -84,25 +82,19 @@ public:
     return _domain == value._domain && _type == value._type &&
            _protocol == value._protocol && _fd == value._fd &&
            _addr == value._addr && _isOpen == value._isOpen &&
-           _isListener == value._isListener &&
-           _isWritable == value._isWritable && _isClosed == value._isClosed &&
-           _isClient == value._isClient && _isServer == value._isServer;
+           _isListener == value._isListener && isWritable == value.isWritable &&
+           _isClosed == value._isClosed && _isClient == value._isClient &&
+           _isServer == value._isServer;
   }
 
-  // void bind(const struct sockaddr addr);
   void bind(const T addr) {
     _allocateAddr();
-    // _addr->sin_family = addr.sin_family;
-    // _addr->sin_addr.s_addr = addr.sin_addr.s_addr;
-    // _addr->sin_port = addr.sin_port;
     memcpy(_addr, &addr, sizeof(addr));
     if (::bind(_fd, reinterpret_cast<struct sockaddr *>(_addr),
                sizeof(*_addr)) == -1) {
       throw std::runtime_error("Error while binding the socket");
     }
   }
-
-  void connect(void) {}
 
   std::string read(std::string eof) {
     std::string result;
@@ -122,12 +114,15 @@ public:
       }
 
       bytes = ::read(_fd, buff, MAX_READ_BYTES);
+      if (bytes == -1) {
+        throw std::runtime_error("Error while trying to read socket");
+      }
     }
     return result;
   }
 
   void write(std::string str) {
-    if (!_isWritable) {
+    if (!isWritable) {
       _pendingMessagesToWrite.push(str);
       return;
     }
@@ -137,7 +132,7 @@ public:
   void close(void) {
     if (_fd != -1) {
       if (::close(_fd) == -1) {
-        Socket::_isServerRunning = false;
+        // Socket::_isServerRunning = false;
       }
     }
   }
@@ -153,10 +148,8 @@ public:
     _isListener = true;
   }
 
-  void accept(Socket *peer_socket) {
-    if (peer_socket->_addr != NULL) {
-      return;
-    }
+  Socket<T> *accept(void) {
+    Socket<T> *peer_socket = new Socket<struct sockaddr_in>();
 
     if (!_isListener) {
       throw std::runtime_error(
@@ -170,103 +163,32 @@ public:
     peer_socket->_allocateAddr();
     unsigned int peer_addr_size = sizeof(*peer_socket->_addr);
 
-    int cfd = ::accept(_fd, reinterpret_cast<sockaddr *>(peer_socket->_addr),
-                       &peer_addr_size);
-    if (cfd == -1) {
-      throw std::runtime_error("Error while trying to accept a request ");
+    peer_socket->_fd = ::accept(
+        _fd, reinterpret_cast<sockaddr *>(peer_socket->_addr), &peer_addr_size);
+    if (peer_socket->_fd == -1) {
+      delete peer_socket;
+      return NULL;
     }
 
-    _setSocketAsNonBlocking(cfd);
-    DebugLog << BOLDGREEN << "New client accepted with fd [" << cfd << "]";
-    peer_socket->_fd = cfd;
-    _sockets.push_back(peer_socket);
+    _setSocketAsNonBlocking(peer_socket->_fd);
+    return peer_socket;
   }
 
-  template <typename Arg>
-  void poll(std::string (*onRequest)(std::string, Socket<T> &, Arg &),
-            void (*sendResponse)(Socket<T> &, Arg &),
-            void (*onDisconnect)(Socket<T> &, Arg &), Arg &argument,
-            std::string eof) {
-    Socket::_isServerRunning = true;
-    while (_isServerRunning) {
-      std::vector<pollfd> fds;
-      int timeout_ms = (5 * 60 * 1000);
-
-      for (int i = 0; i < _sockets.size(); i++) {
-        fds.push_back(
-            (pollfd){.fd = _sockets[i]->getFd(), .events = POLLOUT | POLLIN});
-      }
-
-      int ret = ::poll(fds.data(), fds.size(), timeout_ms);
-      if (ret < 0) {
-        Socket::_isServerRunning = false;
-        continue;
-      } else if (ret == 0) {
-        DebugLog << BOLDBLUE << "Poll timed out";
-        continue;
-      }
-
-      for (int i = 0; i < fds.size(); i++) {
-        Socket<struct sockaddr_in> *peer_socket;
-
-        bool canWrite = fds[i].revents & POLLOUT;
-        bool canRead = fds[i].revents & POLLIN;
-
-        if (*this == *_sockets[i]) {
-          if (canRead) {
-            peer_socket = new Socket<struct sockaddr_in>();
-            accept(peer_socket);
-          }
-          continue;
-        } else {
-          peer_socket = _sockets[i];
-        }
-
-        if (peer_socket->_pendingRemoval) {
-          peer_socket->_erase();
-          continue;
-        }
-
-        if (canWrite) {
-          peer_socket->_isWritable = true;
-          peer_socket->_flushPendingMessages();
-          sendResponse(*peer_socket, argument);
-        } else {
-          peer_socket->_isWritable = false;
-        }
-
-        if (canRead) {
-          std::string request = peer_socket->read(eof);
-          bool hasDisconnected = request.empty();
-
-          if (hasDisconnected) {
-            onDisconnect(*peer_socket, argument);
-            peer_socket->erase();
-
-            continue;
-          }
-
-          std::vector<std::string> commands = split(request, "\r\n");
-          for (int j = 0; j < commands.size(); j++) {
-            std::string response =
-                onRequest(commands[j], *peer_socket, argument);
-            peer_socket->write(response);
-          }
-        }
-      }
+  void flushPendingMessages() {
+    while (!_pendingMessagesToWrite.empty()) {
+      write(_pendingMessagesToWrite.front());
+      _pendingMessagesToWrite.pop();
     }
-    Socket::_cleanup();
   }
 
   void erase() { _pendingRemoval = true; };
-
-  static void cleanup() { Socket::_isServerRunning = false; }
 
   bool isEmpty() const { return (_fd == -1 && _addr == NULL); }
   bool isOpen() const { return _isOpen; }
   bool isListener() const { return _isListener; }
   bool isClosed() const { return _isClosed; }
-  bool isWritable() const { return _isWritable; }
+  bool isPendingRemoval() const { return _pendingRemoval; }
+  bool isWritable;
 
   bool isClient() const { return _isClient; }
   bool isServer() const { return _isServer; }
@@ -286,8 +208,6 @@ public:
   bool _logged;
 
 private:
-  static std::vector<Socket<T> *> _sockets;
-  static bool _isServerRunning;
   std::queue<std::string> _pendingMessagesToWrite;
 
   int _fd;
@@ -301,7 +221,6 @@ private:
   bool _isClosed;
   bool _isClient;
   bool _isServer;
-  bool _isWritable;
   bool _pendingRemoval;
 
   void _allocateAddr(void) {
@@ -322,44 +241,6 @@ private:
       throw std::runtime_error("Error while setting socket as non-blocking");
     }
   }
-
-  void _flushPendingMessages() {
-    while (!_pendingMessagesToWrite.empty()) {
-      write(_pendingMessagesToWrite.front());
-      _pendingMessagesToWrite.pop();
-    }
-  }
-
-  void _erase() {
-    for (typename std::vector<Socket<T> *>::iterator it = _sockets.begin();
-         it != _sockets.end(); it++) {
-      if ((*it)->getFd() == _fd) {
-        close();
-        delete *it;
-        _sockets.erase(it);
-        break;
-      }
-    }
-  }
-
-  static void _cleanup() {
-    typename std::vector<Socket<T> *>::iterator it;
-
-    for (it = Socket::_sockets.begin(); it != Socket::_sockets.end(); it++) {
-      Socket<T> *socket = *it;
-      socket->close();
-      if (!socket->isServer()) { // work around because the server socket is
-        // not allocated, so we cant delete it
-        delete socket;
-      }
-    }
-
-    Socket::_sockets.clear();
-  }
 };
-
-template <typename T>
-std::vector<Socket<T> *> Socket<T>::_sockets = std::vector<Socket<T> *>();
-template <typename T> bool Socket<T>::_isServerRunning = false;
 
 #endif

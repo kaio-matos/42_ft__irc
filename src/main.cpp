@@ -1,13 +1,10 @@
 #include <ft_irc.hpp>
 
-void ctrl_c_handler(int s) { Socket<sockaddr_in>::cleanup(); }
+bool PROGRAM_EXECUTED_SIGINT = false;
+bool PROGRAM_EXECUTED_SIGPIPE = false;
 
-void sigpipe_handler(int s) {
-  // TODO: handle with broken pipes (if the client connection is closed
-  // unexpectedly)
-  DebugLog << "Broken pipe";
-  exit(1);
-}
+void sigint_handler(int s) { PROGRAM_EXECUTED_SIGINT = true; }
+void sigpipe_handler(int s) { PROGRAM_EXECUTED_SIGPIPE = true; }
 
 static bool parseArguments(int argc, char **argv, ClientArgs &args) {
   int port;
@@ -84,8 +81,6 @@ std::string onRequest(std::string request, Socket<T> &from_socket,
   return "";
 }
 
-template <typename T> void sendResponse(Socket<T> &to_socket, IRC<T> &irc) {}
-
 template <typename T> void onDisconnect(Socket<T> &from_socket, IRC<T> &irc) {
   Client<sockaddr_in> *from = irc.getClient(from_socket.getFd());
   std::vector<std::string> args;
@@ -98,7 +93,6 @@ template <typename T> void onDisconnect(Socket<T> &from_socket, IRC<T> &irc) {
 }
 
 int main(int argc, char **argv) {
-
   ClientArgs clientArgs;
 
   if (!parseArguments(argc, argv, clientArgs)) {
@@ -109,25 +103,19 @@ int main(int argc, char **argv) {
   DebugLog << BOLDCYAN
            << "-------------------------- Starting ft_irc "
               "--------------------------";
-  signal(SIGINT, ctrl_c_handler);
+  signal(SIGINT, sigint_handler);
   signal(SIGPIPE, sigpipe_handler);
   // signal(SIGABRT, ctrl_c_handler);
-  Socket<struct sockaddr_in> tcp_socket(AF_INET, SOCK_STREAM, 0);
-  struct sockaddr_in addr;
 
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = stringAddressToBytes("0.0.0.0");
-  addr.sin_port = htons(clientArgs.port);
-
-  tcp_socket.bind(addr);
-  tcp_socket.listen(5);
-
-  DebugLog << "Listening on:\n" << tcp_socket;
   IRC<sockaddr_in> irc(clientArgs);
 
-  tcp_socket.poll(onRequest, sendResponse, onDisconnect, irc, "\n");
+  Server<sockaddr_in, IRC<sockaddr_in> > *app =
+      new Server<sockaddr_in, IRC<sockaddr_in> >(
+          "0.0.0.0", clientArgs.port, onRequest, onDisconnect, irc, "\n");
 
-  tcp_socket.close();
+  app->start();
+
+  delete app;
 
   return 0;
 }

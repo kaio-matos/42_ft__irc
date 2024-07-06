@@ -31,23 +31,6 @@
 #include <set>
 #include <vector>
 
-#define SSTR(x)                                                                \
-  static_cast<std::ostringstream &>((std::ostringstream() << std::dec << x))   \
-      .str()
-
-unsigned int stringAddressToBytes(std::string str);
-std::string getAddressFromSockAddrin(const struct sockaddr_in addr);
-std::string readFile(std::string filename, char separator);
-std::string replaceAll(std::string str, const std::string &from,
-                       const std::string &to);
-
-std::vector<std::string> split(std::string str, std::string del = " ");
-std::vector<std::string> splitByComma(const std::string &data);
-std::string trim(std::string s);
-
-template <typename T> class Socket;
-std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
-
 #define RESET "\033[0m"
 #define BLACK "\033[30m"              /* Black */
 #define RED "\033[31m"                /* Red */
@@ -66,11 +49,33 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
 #define BOLDCYAN "\033[1m\033[36m"    /* Bold Cyan */
 #define BOLDWHITE "\033[1m\033[37m"   /* Bold White */
 
+#define SSTR(x)                                                                \
+  static_cast<std::ostringstream &>((std::ostringstream() << std::dec << x))   \
+      .str()
+
+unsigned int stringAddressToBytes(std::string str);
+std::string getAddressFromSockAddrin(const struct sockaddr_in addr);
+std::string readFile(std::string filename, char separator);
+std::string replaceAll(std::string str, const std::string &from,
+                       const std::string &to);
+
+std::vector<std::string> split(std::string str, std::string del = " ");
+std::vector<std::string> splitByComma(const std::string &data);
+std::string trim(std::string s);
+
+template <typename T> class Socket;
+std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value);
+
+extern bool PROGRAM_EXECUTED_SIGINT;
+extern bool PROGRAM_EXECUTED_SIGPIPE;
+
 #include <Log.hpp>
 
 #include <User.hpp>
 
 #include <Socket.hpp>
+
+#include <Server.hpp>
 
 #include <ClientArgs.hpp>
 
