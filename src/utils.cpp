@@ -29,17 +29,16 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value) {
     sockaddr_in addr = value.getRawAddr();
     os << "\tPort:                 " << ntohs(addr.sin_port) << "\n";
   } catch (const std::exception &e) {
-    os << "\tPort:                 "
-       << "unavailable\n";
+    os << "\tPort:                 " << "unavailable\n";
   }
   try {
     sockaddr_in addr = value.getRawAddr();
     os << "\tAddress:              " << getAddressFromSockAddrin(addr) << "\n";
   } catch (const std::exception &e) {
-    os << "\tAddress:              "
-       << "unavailable\n";
+    os << "\tAddress:              " << "unavailable\n";
   }
-  os << "\tIs Writable:          " << value.isWritable() << "\n"
+  os << "\tIs Writable:          " << value.isWritable << "\n"
+     << "\tIs Closed:            " << value.isClosed() << "\n"
      << "\tLast Pending Message: "
      << (value.getPendingMessagesToWrite().empty()
              ? ""
