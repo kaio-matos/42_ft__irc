@@ -1,10 +1,10 @@
 #include <ft_irc.hpp>
 
 User::User(std::string nickname, std::string username)
-    : username(username), nickname(nickname), host("ft.irc") {}
+    : nickname(nickname), username(username), host("ft.irc") {}
 
 User::User(const User &value)
-    : username(value.username), nickname(value.nickname), host(value.host) {}
+    : nickname(value.nickname), username(value.username), host(value.host) {}
 
 User &User::operator=(const User &value) {
   if (this != &value) {

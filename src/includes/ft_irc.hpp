@@ -55,7 +55,6 @@
 
 unsigned int stringAddressToBytes(std::string str);
 std::string getAddressFromSockAddrin(const struct sockaddr_in addr);
-std::string readFile(std::string filename, char separator);
 std::string replaceAll(std::string str, const std::string &from,
                        const std::string &to);
 

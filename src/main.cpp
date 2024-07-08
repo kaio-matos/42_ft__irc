@@ -3,8 +3,14 @@
 bool PROGRAM_EXECUTED_SIGINT = false;
 bool PROGRAM_EXECUTED_SIGPIPE = false;
 
-void sigint_handler(int s) { PROGRAM_EXECUTED_SIGINT = true; }
-void sigpipe_handler(int s) { PROGRAM_EXECUTED_SIGPIPE = true; }
+void sigint_handler(int s) {
+  (void)s;
+  PROGRAM_EXECUTED_SIGINT = true;
+}
+void sigpipe_handler(int s) {
+  (void)s;
+  PROGRAM_EXECUTED_SIGPIPE = true;
+}
 
 static bool parseArguments(int argc, char **argv, ClientArgs &args) {
   int port;

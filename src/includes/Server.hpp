@@ -58,7 +58,7 @@ public:
         continue;
       }
 
-      for (int i = 0; i < fds.size(); i++) {
+      for (size_t i = 0; i < fds.size(); i++) {
         bool canWrite = fds[i].revents & POLLOUT;
         bool canRead = fds[i].revents & POLLIN;
 
@@ -132,7 +132,7 @@ private:
     }
 
     std::vector<std::string> commands = split(request, "\r\n");
-    for (int i = 0; i < commands.size(); i++) {
+    for (size_t i = 0; i < commands.size(); i++) {
       std::string response = _onRequest(commands[i], *peer_socket, _argument);
       peer_socket->write(response);
     }
@@ -140,9 +140,10 @@ private:
 
   std::vector<pollfd> _getPollFds() {
     std::vector<pollfd> fds;
-    for (int i = 0; i < _sockets.size(); i++) {
-      fds.push_back(
-          (pollfd){.fd = _sockets[i]->getFd(), .events = POLLOUT | POLLIN});
+    for (size_t i = 0; i < _sockets.size(); i++) {
+      fds.push_back((pollfd){.fd = _sockets[i]->getFd(),
+                             .events = POLLOUT | POLLIN,
+                             .revents = 0});
     }
     return fds;
   }

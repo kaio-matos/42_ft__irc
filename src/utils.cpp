@@ -14,9 +14,9 @@ unsigned int stringAddressToBytes(std::string str) {
 std::string getAddressFromSockAddrin(const struct sockaddr_in addr) {
   char host_buffer[NI_MAXHOST];
 
-  if (int err = getnameinfo(reinterpret_cast<const struct sockaddr *>(&addr),
-                            sizeof(addr), host_buffer, sizeof(host_buffer),
-                            NULL, 0, NI_NAMEREQD)) {
+  if (getnameinfo(reinterpret_cast<const struct sockaddr *>(&addr),
+                  sizeof(addr), host_buffer, sizeof(host_buffer), NULL, 0,
+                  NI_NAMEREQD)) {
     return "Not known";
   }
   return std::string(host_buffer);
@@ -29,13 +29,15 @@ std::ostream &operator<<(std::ostream &os, const Socket<sockaddr_in> &value) {
     sockaddr_in addr = value.getRawAddr();
     os << "\tPort:                 " << ntohs(addr.sin_port) << "\n";
   } catch (const std::exception &e) {
-    os << "\tPort:                 " << "unavailable\n";
+    os << "\tPort:                 "
+       << "unavailable\n";
   }
   try {
     sockaddr_in addr = value.getRawAddr();
     os << "\tAddress:              " << getAddressFromSockAddrin(addr) << "\n";
   } catch (const std::exception &e) {
-    os << "\tAddress:              " << "unavailable\n";
+    os << "\tAddress:              "
+       << "unavailable\n";
   }
   os << "\tIs Writable:          " << value.isWritable << "\n"
      << "\tIs Closed:            " << value.isClosed() << "\n"
@@ -79,43 +81,6 @@ std::ostream &operator<<(std::ostream &os, const Channel<sockaddr_in> &value) {
   os << "\t]\n"
      << "}\n";
   return os;
-}
-
-std::string readFile(std::string filename, char separator) {
-  std::ifstream file(filename.c_str());
-
-  if (file.fail()) {
-    std::string err = "Error opening the file: ";
-    err.append(filename);
-    file.close();
-    throw std::runtime_error(err);
-  }
-
-  DIR *dir = opendir(filename.c_str());
-
-  if (dir != NULL) {
-
-    std::string err = "Error opening the file: ";
-    err.append(filename);
-    closedir(dir);
-    throw std::runtime_error(err);
-  }
-
-  std::string line, result;
-  unsigned int i = 0;
-  while (std::getline(file, line)) {
-    if (line.empty())
-      continue;
-
-    if (i != 0) {
-      result.append("\n");
-    }
-    result.append(line);
-    i++;
-  }
-
-  file.close();
-  return result;
 }
 
 std::string replaceAll(std::string str, const std::string &from,

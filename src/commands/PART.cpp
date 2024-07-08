@@ -15,7 +15,7 @@ std::string PART(std::vector<std::string> args,
   std::vector<std::string> channels = splitByComma(args[0]);
   std::string reason;
 
-  for (int i = 1; i < args.size(); i++) {
+  for (size_t i = 1; i < args.size(); i++) {
     if (i != 1)
       reason.append(" ");
     reason.append(args[i]);

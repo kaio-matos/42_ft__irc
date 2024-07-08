@@ -4,7 +4,7 @@ NAME		= ircserv
 OBJS_DIR	= objects
 SRC_DIR		= src
 
-CCF_STRICT	= -Wall -Wextra -Werror -std=c++98
+CCF_STRICT	= -D VERBOSE=0 -Wall -Wextra -Werror -std=c++98
 CCF_DEBUG	= -g3 -D VERBOSE=1
 FLAGS		= -I ./$(SRC_DIR)/includes
 

@@ -9,9 +9,10 @@ public:
   typedef std::map<int, Client<T> *> map;
 
   Channel(std::string channelName)
-      : _channelName(channelName), _operatorTopicOnly(false), _hasPasswd(false),
-        _userLimit(-1), _hasUserlimit(false), _isInviteOnly(false),
-        _clients(Channel::map()), _operators(Channel::map()), _topic("") {}
+      : _clients(Channel::map()), _operators(Channel::map()),
+        _channelName(channelName), _topic(""), _operatorTopicOnly(false),
+        _hasPasswd(false), _userLimit(-1), _hasUserlimit(false),
+        _isInviteOnly(false) {}
 
   Channel(const Channel &value)
       : _channelName(value._channelName), _topic(value._topic),
@@ -63,7 +64,7 @@ public:
 
   void broadcast(Client<T> exclude, std::string message) {
     typename map::iterator it = _clients.begin();
-    for (it; it != _clients.end(); it++) {
+    for (; it != _clients.end(); it++) {
       if (exclude != *it->second) {
         it->second->socket.write(message);
       }
@@ -72,7 +73,7 @@ public:
 
   void broadcast(std::string message) {
     typename map::iterator it = _clients.begin();
-    for (it; it != _clients.end(); it++) {
+    for (; it != _clients.end(); it++) {
       it->second->socket.write(message);
     }
   };
@@ -90,7 +91,7 @@ public:
   Client<T> *getClient(std::string nickname) {
     typename map::iterator it = _clients.begin();
 
-    for (it; it != _clients.end(); it++) {
+    for (; it != _clients.end(); it++) {
       if (nickname == it->second->user.nickname) {
         return it->second;
       }

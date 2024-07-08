@@ -10,7 +10,7 @@ std::string QUIT(std::vector<std::string> args,
 
   std::string message;
 
-  for (int i = 0; i < args.size(); i++) {
+  for (size_t i = 0; i < args.size(); i++) {
     if (i != 0)
       message.append(" ");
     message.append(args[i]);

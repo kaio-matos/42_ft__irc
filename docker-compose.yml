@@ -10,6 +10,6 @@ services:
             - .:/app
         environment:
             - TERM=xterm-256color
-            - DEBUG=1
+            # - DEBUG=1
         stdin_open: true
         tty: true
