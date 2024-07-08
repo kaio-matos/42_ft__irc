@@ -17,7 +17,7 @@ std::string PRIVMSG(std::vector<std::string> args,
     return ERR_NOTEXTTOSEND(from->user.nickname);
   }
 
-  std::string target_nickname_or_channel = args[0];
+  std::vector<std::string> targets = splitByComma(args[0]);
   std::string message;
 
   for (size_t i = 1; i < args.size(); i++) {
@@ -26,37 +26,47 @@ std::string PRIVMSG(std::vector<std::string> args,
     message.append(args[i]);
   }
 
-  Channel<sockaddr_in> *target_channel =
-      irc.getChannel(target_nickname_or_channel);
-  Client<sockaddr_in> *target_client =
-      irc.getClient(target_nickname_or_channel);
+  for (std::vector<std::string>::iterator it = targets.begin();
+       it != targets.end(); it++) {
+    std::string target_nickname_or_channel = *it;
 
-  if (false) { // TODO:
-    return ERR_NOSUCHSERVER(from->user.nickname, "servername");
-  }
+    Channel<sockaddr_in> *target_channel =
+        irc.getChannel(target_nickname_or_channel);
+    Client<sockaddr_in> *target_client =
+        irc.getClient(target_nickname_or_channel);
 
-  if (false) { // TODO:
-    return ERR_CANNOTSENDTOCHAN(from->user.nickname,
-                                target_channel->getChannelName());
-  }
-
-  if (target_channel) {
-    if (!target_channel->getClient(from->socket)) {
-      return ERR_NOTONCHANNEL(from->user.nickname,
-                              target_channel->getChannelName());
+    if (false) { // TODO:
+      from->socket.write(ERR_NOSUCHSERVER(from->user.nickname, "servername"));
+      continue;
     }
 
-    target_channel->broadcast(
-        *from, MSG_PRIVMSG(from->user.nickname,
-                           target_channel->getChannelName(), message));
-    return "";
+    if (false) { // TODO:
+      from->socket.write(ERR_CANNOTSENDTOCHAN(
+          from->user.nickname, target_channel->getChannelName()));
+      continue;
+    }
+
+    if (target_channel) {
+      if (!target_channel->getClient(from->socket)) {
+        from->socket.write(ERR_NOTONCHANNEL(from->user.nickname,
+                                            target_channel->getChannelName()));
+        continue;
+      }
+
+      target_channel->broadcast(
+          *from, MSG_PRIVMSG(from->user.nickname,
+                             target_channel->getChannelName(), message));
+      continue;
+    }
+
+    if (target_client) {
+      target_client->socket.write(MSG_PRIVMSG(
+          from->user.nickname, target_client->user.nickname, message));
+      continue;
+    }
+    from->socket.write(
+        ERR_NOSUCHNICK(from->user.nickname, target_nickname_or_channel));
   }
 
-  if (target_client) {
-    target_client->socket.write(MSG_PRIVMSG(
-        from->user.nickname, target_client->user.nickname, message));
-    return "";
-  }
-
-  return ERR_NOSUCHNICK(from->user.nickname, target_nickname_or_channel);
+  return "";
 }
