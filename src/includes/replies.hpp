@@ -19,6 +19,7 @@
 #define MSG_PART(identity, channel)                     std::string(":" + identity + " PART " + channel + "\r\n")
 #define MSG_PARTREASON(identity, channel, reason)       std::string(":" + identity + " PART " + channel + " " + reason + "\r\n")
 #define MSG_QUIT(identity, message)                     std::string(":" + identity + " QUIT :Quit " + message + "\r\n")
+#define MSG_KICK(identity, channel, target, message)    std::string(":" + identity + " KICK " + channel + " " + target + " " + message + "\r\n")
 
 //numeric replies  
 #define RPL_WELCOME(target, nickname, username)         numericReply("001", target, ":Welcome to the " + SERVER_NAME + " Network, " + nickname + "[!" + username + "@*]")
@@ -40,7 +41,7 @@
 #define ERR_NONICKNAMEGIVEN(target)                     numericReply("431", target, ":No nickname given")
 #define ERR_ERRONEUSNICKNAME(target, nickname)          numericReply("432", target, nickname + " :Erroneus nickname")
 #define ERR_NICKNAMEINUSE(target, nickname)             numericReply("433", target, nickname + " :Nickname is already in use")
-#define ERR_USERNOTINCHANNEL(target, nickname, channel) numericReply("441", target, nickname + " " + channel + " :You're not channel operator")
+#define ERR_USERNOTINCHANNEL(target, nickname, channel) numericReply("441", target, nickname + " " + channel + " :They aren't on that channel")
 #define ERR_NOTONCHANNEL(target, channel)               numericReply("442", target, channel + " :You're not on that channel")
 #define ERR_USERONCHANNEL(target, nickname, channel)    numericReply("443", target, nickname + " " + channel + " :is already on channel")
 #define ERR_NOTREGISTERED                               numericReply("451", "User", ":You have not registered")

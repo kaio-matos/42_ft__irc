@@ -29,28 +29,38 @@ std::string KICK(std::vector<std::string> args,
     return ERR_NOTONCHANNEL(from->user.nickname, channel->getChannelName());
   }
 
-  if (false) { // TODO:
+  if (!channel->isOperator(from)) {
     return ERR_CHANOPRIVSNEEDED(from->user.nickname, channel->getChannelName());
   }
 
   Client<sockaddr_in> *client = channel->getClient(nickname);
 
   if (!client) {
-    return ERR_USERNOTINCHANNEL(client->user.nickname, nickname,
+    return ERR_USERNOTINCHANNEL(from->user.nickname, nickname,
+                                channel->getChannelName());
+  }
+
+  if (channel->isOperator(client)) {
+    return ERR_CHANOPRIVSNEEDED(from->user.nickname, channel->getChannelName());
+  }
+
+  if (from == client) {
+    return ERR_USERNOTINCHANNEL(from->user.nickname, nickname,
                                 channel->getChannelName());
   }
 
   if (channel->disconnectClient(*client)) {
+    std::string message;
     if (!comment.empty()) {
-      channel->broadcast(client->user.nickname + " got kicked because " +
-                         comment);
+      message = MSG_KICK(from->user.identity(), channel->getChannelName(),
+                         client->user.nickname, comment);
     } else {
-      channel->broadcast(client->user.nickname + " got kicked\r\n");
+      message = MSG_KICK(from->user.identity(), channel->getChannelName(),
+                         client->user.nickname, "");
     }
+    channel->broadcast(message);
+    client->socket.write(message);
   }
 
-  // TODO: check if we can send this
-  client->socket.write("You got kicked from " + channel->getChannelName() +
-                       "\r\n");
   return "";
 }
