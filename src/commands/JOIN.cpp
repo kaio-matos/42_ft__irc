@@ -2,11 +2,6 @@
 
 std::string JOIN(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
-  // typedef std::map<int, Client<sockaddr_in> >::iterator ClientIterator;
-  // typedef std::map<std::string, Channel<sockaddr_in> >::iterator
-  // ChannelIterator;
-
-  // ClientIterator client_it = irc.clients.find(from_socket.getFd());
 
   Client<sockaddr_in> *client = irc.getClient(from_socket.getFd());
   if (!client || !from_socket._logged) {

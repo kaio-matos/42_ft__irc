@@ -35,17 +35,6 @@ std::string PRIVMSG(std::vector<std::string> args,
     Client<sockaddr_in> *target_client =
         irc.getClient(target_nickname_or_channel);
 
-    if (false) { // TODO:
-      from->socket.write(ERR_NOSUCHSERVER(from->user.nickname, "servername"));
-      continue;
-    }
-
-    if (false) { // TODO:
-      from->socket.write(ERR_CANNOTSENDTOCHAN(
-          from->user.nickname, target_channel->getChannelName()));
-      continue;
-    }
-
     if (target_channel) {
       if (!target_channel->getClient(from->socket)) {
         from->socket.write(ERR_NOTONCHANNEL(from->user.nickname,

@@ -28,12 +28,10 @@ std::string INVITE(std::vector<std::string> args,
   Client<sockaddr_in> *invited = irc.getClient(nickname);
 
   if (!invited) {
-    return ERR_NOSUCHNICK(
-        nickname,
-        nickname); // TODO: Check if we can use this error for this command
+    return ERR_NOSUCHNICK(from->user.nickname, nickname);
   }
 
-  if (to_channel->isOperator(from) && to_channel->isInviteOnly()) {
+  if (!to_channel->isOperator(from) && to_channel->isInviteOnly()) {
     return ERR_CHANOPRIVSNEEDED(from->user.nickname,
                                 to_channel->getChannelName());
   }
