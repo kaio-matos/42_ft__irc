@@ -27,9 +27,7 @@ std::string USER(std::vector<std::string> args,
       .append(RPL_WELCOME(createdClient->user.nickname,
                           createdClient->user.nickname,
                           createdClient->user.username))
-      .append(RPL_YOURHOST(
-          createdClient->user.nickname, "weechat",
-          "1")) // TODO: check how to get the client name and version
+      .append(RPL_YOURHOST(createdClient->user.nickname, SERVER_NAME, "1"))
       .append(RPL_CREATED(createdClient->user.nickname))
       .append(RPL_MYINFO(createdClient->user.nickname));
 
