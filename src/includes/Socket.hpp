@@ -11,6 +11,7 @@ public:
     _fd = -1;
     _addr = NULL;
     _pendingMessagesToWrite = std::queue<std::string>();
+    _pendingMessageToRead = std::string();
 
     _logged = false;
     _isOpen = false;
@@ -29,6 +30,7 @@ public:
     _fd = socket(domain, type, protocol);
     _addr = NULL;
     _pendingMessagesToWrite = std::queue<std::string>();
+    _pendingMessageToRead = std::string();
 
     _isOpen = false;
     _isListener = false;
@@ -52,6 +54,7 @@ public:
     _addr = NULL;
     _pendingMessagesToWrite =
         std::queue<std::string>(value._pendingMessagesToWrite);
+    _pendingMessageToRead = value._pendingMessageToRead;
     if (value._addr != NULL) {
       _allocateAddr();
       memcpy(_addr, &value._addr, sizeof(value._addr));
@@ -97,28 +100,46 @@ public:
   }
 
   std::string read(std::string eof) {
-    std::string result;
+    std::string result = _pendingMessageToRead;
     int MAX_READ_BYTES = 100;
+    int MAX_TRIES = 1;
+    int tries = 0;
     char buff[MAX_READ_BYTES];
+    bool hasReachedEOF = false;
 
+    std::memset(buff, 0, MAX_READ_BYTES);
     int bytes = ::read(_fd, buff, MAX_READ_BYTES);
+
     if (bytes == -1) {
       throw std::runtime_error("Error while trying to read socket");
     }
-    while (bytes) {
-      std::string buffer(buff, bytes);
-      result.append(buffer);
+    while (!hasReachedEOF && tries <= MAX_TRIES) {
+      if (bytes == 0)
+        return "";
+      if (bytes != -1) {
+        std::string buffer(buff, bytes);
+        result.append(buffer);
 
-      if (buffer.substr(bytes - eof.length(), eof.length()) == eof) {
+        hasReachedEOF =
+            buffer.substr(bytes - eof.length(), eof.length()) == eof;
+      }
+
+      if (hasReachedEOF) {
         break;
       }
 
       bytes = ::read(_fd, buff, MAX_READ_BYTES);
       if (bytes == -1) {
-        throw std::runtime_error("Error while trying to read socket");
+        tries++;
       }
     }
-    return result;
+
+    if (hasReachedEOF) {
+      _pendingMessageToRead = "";
+      return result;
+    }
+    _pendingMessageToRead = result;
+    return "\r\n";
   }
 
   void write(std::string str) {
@@ -209,6 +230,7 @@ public:
 
 private:
   std::queue<std::string> _pendingMessagesToWrite;
+  std::string _pendingMessageToRead;
 
   int _fd;
   int _domain;
