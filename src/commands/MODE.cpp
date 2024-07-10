@@ -152,7 +152,8 @@ std::string MODE(std::vector<std::string> args,
 
       replyParams += modesParams[paramPosition] + " ";
       if (channelRef.getClient(modesParams[paramPosition]) == NULL)
-        return (ERR_NOTONCHANNEL(modesParams[paramPosition], channelName));
+        return (ERR_USERNOTINCHANNEL(modesParams[paramPosition], nick,
+                                     channelName));
       if (client == channelRef.getClient(modesParams[paramPosition]))
         return (ERR_UNKNOWNMODE(nick, 'o'));
       if (action) {

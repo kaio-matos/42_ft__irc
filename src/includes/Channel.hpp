@@ -103,6 +103,8 @@ public:
     std::string userList;
     for (typename map::const_iterator it = _clients.begin();
          it != _clients.end(); ++it) {
+      if (isOperator(it->second))
+        userList += "@";
       userList += it->second->user.nickname + " ";
     }
     if (!userList.empty()) {
