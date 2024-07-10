@@ -43,8 +43,6 @@ public:
   void connectClient(Client<T> &client) {
     DebugLog << "Client fd: " << client.socket.getFd();
     _clients.insert(std::make_pair(client.socket.getFd(), &client));
-    broadcast(client, "New user " + client.user.nickname +
-                          " has entered the channel\n");
   };
 
   bool disconnectClient(Client<T> &client) {

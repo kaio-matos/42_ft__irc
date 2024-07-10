@@ -15,7 +15,6 @@ std::string JOIN(std::vector<std::string> args,
   if (args.size() > 1)
     key = splitByComma(args[1]);
 
-  std::string reply;
   if (key.size() != channels.size() && !key.empty())
     return ERR_NEEDMOREPARAMS(nick, "JOIN");
 
@@ -37,7 +36,7 @@ std::string JOIN(std::vector<std::string> args,
       channelKey = key[i];
 
     if (channelName[0] != '#' && channelName[0] != '&') {
-      reply += ERR_NOSUCHCHANNEL(nick, channelName);
+      client->socket.write(ERR_NOSUCHCHANNEL(nick, channelName));
       continue;
     }
 
@@ -49,7 +48,7 @@ std::string JOIN(std::vector<std::string> args,
     }
 
     if (channel->isInviteOnly() && !client->hasPendingInviteFrom(channelName)) {
-      reply += ERR_INVITEONLYCHAN(nick, channelName);
+      client->socket.write(ERR_INVITEONLYCHAN(nick, channelName));
       continue;
     }
 
@@ -57,11 +56,11 @@ std::string JOIN(std::vector<std::string> args,
       continue;
 
     if (channel->hasPassword() && channel->getPasswd() != channelKey) {
-      reply += ERR_BADCHANNELKEY(nick, channelName);
+      client->socket.write(ERR_BADCHANNELKEY(nick, channelName));
       continue;
     }
     if (channel->getClients().size() >= channel->getUserLimit()) {
-      reply += ERR_CHANNELISFULL(nick, channelName);
+      client->socket.write(ERR_CHANNELISFULL(nick, channelName));
       continue;
     }
 
@@ -73,13 +72,14 @@ std::string JOIN(std::vector<std::string> args,
 
     std::string channelUsers = channel->getChannelUsers();
 
-    reply += MSG_JOIN(nick, channelName) +
-             (channel->getTopic().empty()
-                  ? ""
-                  : RPL_TOPIC(nick, channelName, channel->getTopic())) +
-             RPL_NAMREPLY(nick, channelName, channelUsers) +
-             RPL_ENDOFNAMES(nick, channelName);
+    channel->broadcast(
+        MSG_JOIN(nick, channelName) +
+        (channel->getTopic().empty()
+             ? ""
+             : RPL_TOPIC(nick, channelName, channel->getTopic())) +
+        RPL_NAMREPLY(nick, channelName, channelUsers) +
+        RPL_ENDOFNAMES(nick, channelName));
   }
 
-  return reply;
+  return "";
 }
