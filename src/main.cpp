@@ -111,17 +111,18 @@ int main(int argc, char **argv) {
               "--------------------------";
   signal(SIGINT, sigint_handler);
   signal(SIGPIPE, sigpipe_handler);
-  // signal(SIGABRT, ctrl_c_handler);
 
-  IRC<sockaddr_in> irc(clientArgs);
+  try {
+    IRC<sockaddr_in> irc(clientArgs);
 
-  Server<sockaddr_in, IRC<sockaddr_in> > *app =
-      new Server<sockaddr_in, IRC<sockaddr_in> >(
-          "0.0.0.0", clientArgs.port, onRequest, onDisconnect, irc, "\n");
+    Server<sockaddr_in, IRC<sockaddr_in> > app(
+        "0.0.0.0", clientArgs.port, onRequest, onDisconnect, irc, "\n");
 
-  app->start();
+    app.start();
 
-  delete app;
+  } catch (const std::exception &error) {
+    std::cerr << "Error: " << error.what() << std::endl;
+  }
 
   return 0;
 }

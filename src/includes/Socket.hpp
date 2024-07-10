@@ -95,6 +95,8 @@ public:
     memcpy(_addr, &addr, sizeof(addr));
     if (::bind(_fd, reinterpret_cast<struct sockaddr *>(_addr),
                sizeof(*_addr)) == -1) {
+      delete _addr;
+      _addr = NULL;
       throw std::runtime_error("Error while binding the socket");
     }
   }

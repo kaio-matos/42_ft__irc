@@ -11,18 +11,24 @@ public:
          std::string eof)
       : _onRequest(onRequest), _onDisconnect(onDisconnect), _argument(argument),
         _eof(eof) {
-    _server_socket = new Socket<struct sockaddr_in>(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = stringAddressToBytes(address);
-    addr.sin_port = htons(port);
-    _server_socket->bind(addr);
-    _server_socket->listen(5);
+    _server_socket = NULL;
+    try {
+      _server_socket = new Socket<struct sockaddr_in>(AF_INET, SOCK_STREAM, 0);
+      struct sockaddr_in addr;
+      addr.sin_family = AF_INET;
+      addr.sin_addr.s_addr = stringAddressToBytes(address);
+      addr.sin_port = htons(port);
+      _server_socket->bind(addr);
+      _server_socket->listen(5);
 
-    _sockets = std::vector<Socket<sockaddr_in> *>();
-    _sockets.push_back(_server_socket);
+      _sockets = std::vector<Socket<sockaddr_in> *>();
+      _sockets.push_back(_server_socket);
 
-    _isServerRunning = false;
+      _isServerRunning = false;
+    } catch (const std::exception &error) {
+      delete _server_socket;
+      throw std::runtime_error(error.what());
+    }
   }
   ~Server() {
     typename std::vector<Socket<sockaddr_in> *>::iterator it;
