@@ -12,8 +12,8 @@ std::string JOIN(std::vector<std::string> args,
 
   std::vector<std::string> channels = splitByComma(args[0]);
   std::vector<std::string> key;
-  if (key.size() > 1)
-    key = splitByComma(key[1]);
+  if (args.size() > 1)
+    key = splitByComma(args[1]);
 
   std::string reply;
   if (key.size() != channels.size() && !key.empty())
@@ -32,6 +32,7 @@ std::string JOIN(std::vector<std::string> args,
   for (size_t i = 0; i < channels.size(); i++) {
     std::string channelName = channels[i];
     std::string channelKey;
+
     if (!key.empty())
       channelKey = key[i];
 
@@ -54,7 +55,8 @@ std::string JOIN(std::vector<std::string> args,
 
     if (channel->isClientInChannel(client))
       continue;
-    if (!channelKey.empty() && channel->getPasswd() != channelKey) {
+
+    if (channel->hasPassword() && channel->getPasswd() != channelKey) {
       reply += ERR_BADCHANNELKEY(nick, channelName);
       continue;
     }
