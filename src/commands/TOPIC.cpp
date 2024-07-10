@@ -12,7 +12,7 @@ std::string TOPIC(std::vector<std::string> args,
   std::string user = client->user.username;
 
   // verificar a quantidade de argumentos passados
-  if (args.size() < 1 || args.size() > 3)
+  if (args.size() < 1)
     return ERR_NEEDMOREPARAMS(nick, "TOPIC"); // retorna erro
 
   std::string channelName = args[0];
@@ -42,7 +42,14 @@ std::string TOPIC(std::vector<std::string> args,
     return (ERR_CHANOPRIVSNEEDED(nick, channelName));
 
   // Definir o novo topico
-  std::string newTopic = args[1];
+  std::string newTopic;
+
+  for (size_t i = 1; i < args.size(); i++) {
+    if (i != 1)
+      newTopic.append(" ");
+    newTopic.append(args[i]);
+  }
+
   channel->setTopic(newTopic);
 
   // notificar os clients do canal sobre a mudanca

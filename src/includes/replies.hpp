@@ -12,7 +12,7 @@
 //comand replies
 #define MSG_JOIN(user, channel)                         std::string(":" + user + " JOIN " + channel + "\r\n")
 #define MSG_MODE(nick, user, channel)                   std::string(":" + nick + "!~" + user + " MODE " + channel + " ")
-#define MSG_TOPIC(nick, user, channel, topic)           std::string(":" + nick + "!~" + user + " TOPIC " + channel + " :" + topic + "\r\n")
+#define MSG_TOPIC(nick, user, channel, topic)           std::string(":" + nick + "!~" + user + " TOPIC " + channel + " " + topic + "\r\n")
 #define MSG_PRIVMSG(nick, channel_or_nick, message)     std::string(":" + nick + " PRIVMSG " + channel_or_nick + " " + message + "\r\n")
 #define MSG_INVITE(identity, nick, channel)             std::string(":" + identity + " INVITE " + nick + " " + channel + "\r\n")
 #define MSG_PONG(server, token)                         std::string(std::string("PONG ") + server + " " + token + "\r\n")
