@@ -151,13 +151,10 @@ std::string MODE(std::vector<std::string> args,
     case 'o': {
 
       replyParams += modesParams[paramPosition] + " ";
-
-      if (!channelRef.isClientInChannel(
-              channelRef.getClient(modesParams[paramPosition])))
+      if (channelRef.getClient(modesParams[paramPosition]) == NULL)
         return (ERR_NOTONCHANNEL(modesParams[paramPosition], channelName));
       if (client == channelRef.getClient(modesParams[paramPosition]))
         return (ERR_UNKNOWNMODE(nick, 'o'));
-
       if (action) {
         channelRef.addOperator(
             channelRef.getClient(modesParams[paramPosition++]));
