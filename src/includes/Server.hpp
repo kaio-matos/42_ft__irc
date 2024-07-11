@@ -21,8 +21,8 @@ public:
       _server_socket->bind(addr);
       _server_socket->listen(5);
 
-      _sockets = std::vector<Socket<sockaddr_in> *>();
-      _sockets.push_back(_server_socket);
+      _sockets = std::map<int, Socket<sockaddr_in> *>();
+      _sockets.insert(std::make_pair(_server_socket->getFd(), _server_socket));
 
       _isServerRunning = false;
     } catch (const std::exception &error) {
@@ -31,10 +31,10 @@ public:
     }
   }
   ~Server() {
-    typename std::vector<Socket<sockaddr_in> *>::iterator it;
+    typename std::map<int, Socket<T> *>::iterator it;
 
     for (it = _sockets.begin(); it != _sockets.end(); it++) {
-      Socket<sockaddr_in> *socket = *it;
+      Socket<sockaddr_in> *socket = it->second;
       socket->close();
       delete socket;
     }
@@ -65,20 +65,21 @@ public:
       }
 
       for (size_t i = 0; i < fds.size(); i++) {
+        int fd = fds[i].fd;
         bool canWrite = fds[i].revents & POLLOUT;
         bool canRead = fds[i].revents & POLLIN;
 
-        if (*_server_socket == *_sockets[i]) {
+        if (_sockets[fd]->isServer()) {
           if (canRead) {
             Socket<struct sockaddr_in> *new_socket = _server_socket->accept();
-            _sockets.push_back(new_socket);
+            _sockets.insert(std::make_pair(new_socket->getFd(), new_socket));
             DebugLog << BOLDGREEN << "New client accepted with fd ["
                      << new_socket->getFd() << "]";
           }
           continue;
         }
 
-        Socket<struct sockaddr_in> *peer_socket = _sockets[i];
+        Socket<struct sockaddr_in> *peer_socket = _sockets[fd];
 
         if (peer_socket->isPendingRemoval()) {
           deleteSocket(*peer_socket);
@@ -102,21 +103,19 @@ public:
   void stop() { _isServerRunning = false; }
 
   void deleteSocket(Socket<sockaddr_in> &socket) {
-    for (typename std::vector<Socket<sockaddr_in> *>::iterator it =
-             _sockets.begin();
-         it != _sockets.end(); it++) {
-      if ((*it)->getFd() == socket.getFd()) {
-        socket.close();
-        delete *it;
-        _sockets.erase(it);
-        break;
-      }
+    try {
+      int fd = socket.getFd();
+      Socket<sockaddr_in> *found = _sockets.at(fd);
+      found->close();
+      delete found;
+      _sockets.erase(fd);
+    } catch (const std::exception &error) {
     }
   }
 
 private:
   bool _isServerRunning;
-  std::vector<Socket<sockaddr_in> *> _sockets;
+  std::map<int, Socket<sockaddr_in> *> _sockets;
   Socket<sockaddr_in> *_server_socket;
   std::string (*_onRequest)(std::string, Socket<T> &, Arg &);
   void (*_onDisconnect)(Socket<T> &, Arg &);
@@ -132,6 +131,7 @@ private:
     bool hasDisconnected = request.empty();
 
     if (hasDisconnected) {
+      DebugLog << RED << "Disconnecting fd [" << peer_socket->getFd() << "]";
       _onDisconnect(*peer_socket, _argument);
       peer_socket->erase();
       return;
@@ -145,12 +145,14 @@ private:
   }
 
   std::vector<pollfd> _getPollFds() {
+    typename std::map<int, Socket<T> *>::iterator it;
     std::vector<pollfd> fds;
-    for (size_t i = 0; i < _sockets.size(); i++) {
-      fds.push_back((pollfd){.fd = _sockets[i]->getFd(),
-                             .events = POLLOUT | POLLIN,
-                             .revents = 0});
+
+    for (it = _sockets.begin(); it != _sockets.end(); it++) {
+      fds.push_back((pollfd){
+          .fd = it->second->getFd(), .events = POLLOUT | POLLIN, .revents = 0});
     }
+
     return fds;
   }
 };

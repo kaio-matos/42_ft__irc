@@ -10,7 +10,6 @@ await client.send("JOIN #games");
 //   exit();
 // });
 
-
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -34,4 +33,3 @@ function askCommand() {
   });
 }
 askCommand();
-
