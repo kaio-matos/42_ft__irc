@@ -2,7 +2,6 @@
 #define CHANNEL_H
 #include <ft_irc.hpp>
 
-// todo por nome e ajeitar o topic
 template <typename T> class Channel {
 
 public:

@@ -3,8 +3,8 @@
 
 #define SERVER_NAME "ft_irc"
 #define SERVER_VERSION "1"
-#define SERVER_USER_MODES "" // TODO: list of user modes
-#define SERVER_CHANNEL_MODES "" // TODO: list of channel modes
+#define SERVER_USER_MODES ""
+#define SERVER_CHANNEL_MODES "itklo"
 #define SERVER_CREATED_AT "06/01/2024"
 
 #define numericReply(numeric, target, message)          std::string(":ft-irc ") + numeric + " " + target + " " + message + "\r\n"

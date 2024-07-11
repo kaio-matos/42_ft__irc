@@ -73,10 +73,6 @@ public:
   }
 
   ~Socket(void) {
-    // TODO: This was commented due to issues with std::vector, is there another
-    // option?
-
-    // close();
     delete _addr;
     _addr = NULL;
   }

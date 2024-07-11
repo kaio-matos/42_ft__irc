@@ -21,16 +21,6 @@ std::string JOIN(std::vector<std::string> args,
   if (key.size() != channels.size() && !key.empty())
     return ERR_NEEDMOREPARAMS(nick, "JOIN");
 
-  /*
-  //no irc se der "join 0" ele desconecta de todos os canais
-  if (channels[0] == "0") {
-      for (ChannelIterator channel_it = irc.channels.begin(); channel_it !=
-  irc.channels.end(); ++channel_it) {
-          channel_it->second.disconnectClient(client);
-      }
-      return "";
-  }*/
-
   for (size_t i = 0; i < channels.size(); i++) {
     std::string channelName = channels[i];
     std::string channelKey;
