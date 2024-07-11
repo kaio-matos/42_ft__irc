@@ -6,7 +6,8 @@ class User {
 public:
   User(void);
 
-  User(std::string nickname, std::string username);
+  User(std::string username, std::string realname);
+  User(std::string nickname);
 
   User(const User &value);
 
@@ -17,9 +18,11 @@ public:
   bool operator==(const User &value) const;
 
   std::string identity();
+  bool isComplete();
 
-  std::string nickname;
   std::string username;
+  std::string realname;
+  std::string nickname;
   std::string host;
 };
 

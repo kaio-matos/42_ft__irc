@@ -33,7 +33,7 @@ std::string MODE(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
 
   Client<sockaddr_in> *client = irc.getClient(from_socket.getFd());
-  if (!client || !from_socket._logged) {
+  if (!irc.isRegistered(client)) {
     return ERR_NOTREGISTERED;
   }
   std::string nick = client->user.nickname;

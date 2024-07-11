@@ -4,11 +4,14 @@ std::string JOIN(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
 
   Client<sockaddr_in> *client = irc.getClient(from_socket.getFd());
-  if (!client || !from_socket._logged) {
+  if (!irc.isRegistered(client)) {
     return ERR_NOTREGISTERED;
   }
   std::string nick = client->user.nickname;
   std::string user = client->user.username;
+
+  if (args.size() < 1)
+    return ERR_NEEDMOREPARAMS(nick, "JOIN");
 
   std::vector<std::string> channels = splitByComma(args[0]);
   std::vector<std::string> key;

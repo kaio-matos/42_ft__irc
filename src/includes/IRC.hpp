@@ -90,6 +90,13 @@ public:
     clients.erase(clientIt);
   }
 
+  void broadcast(std::string message) {
+    for (typename std::map<int, Client<T> *>::iterator it = clients.begin();
+         it != clients.end(); it++) {
+      it->second->socket.write(message);
+    }
+  }
+
   void broadcastToConnectedChannels(Client<T> &from, std::string message) {
     for (typename std::map<std::string, Channel<T> *>::iterator it =
              channels.begin();
@@ -98,6 +105,14 @@ public:
         it->second->broadcast(from, message);
       }
     }
+  }
+
+  bool isRegistered(Client<T> *client) {
+    if (!client)
+      return false;
+    if (!client->socket._logged)
+      return false;
+    return client->user.isComplete();
   }
 
   std::map<int, Client<T> *> clients;

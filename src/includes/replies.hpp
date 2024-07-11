@@ -20,6 +20,8 @@
 #define MSG_PARTREASON(identity, channel, reason)       std::string(":" + identity + " PART " + channel + " " + reason + "\r\n")
 #define MSG_QUIT(identity, message)                     std::string(":" + identity + " QUIT :Quit " + message + "\r\n")
 #define MSG_KICK(identity, channel, target, message)    std::string(":" + identity + " KICK " + channel + " " + target + " " + message + "\r\n")
+#define MSG_NICK(identity, nickname)                    std::string(":" + identity + " NICK " + nickname + " " + "\r\n")
+
 
 //numeric replies  
 #define RPL_WELCOME(target, nickname, username)         numericReply("001", target, ":Welcome to the " + SERVER_NAME + " Network, " + nickname + "[!" + username + "@*]")

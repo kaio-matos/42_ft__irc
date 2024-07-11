@@ -21,8 +21,10 @@ static bool isNicknameValid(const std::string &nickname) {
   return (true);
 }
 
-static std::string getNicknameIfNotSet(const User &client) {
-  std::string nickname = client.nickname;
+static std::string getNicknameIfNotSet(const Client<sockaddr_in> *client) {
+  if (!client)
+    return "user";
+  std::string nickname = client->user.nickname;
 
   if (nickname.empty()) {
     return ("user");
@@ -34,24 +36,38 @@ std::string NICK(std::vector<std::string> args,
                  Socket<sockaddr_in> &from_socket, IRC<sockaddr_in> &irc) {
   Client<sockaddr_in> *from = irc.getClient(from_socket.getFd());
 
-  if (!from || !from_socket._logged) {
+  if (!from_socket._logged) {
     return ERR_NOTREGISTERED;
   }
 
   if (args.size() < 1)
-    return ERR_NONICKNAMEGIVEN(getNicknameIfNotSet(from->user));
+    return ERR_NONICKNAMEGIVEN(getNicknameIfNotSet(from));
 
   std::string nickname = args[0];
 
   if (irc.getClient(nickname) != NULL) {
-    return ERR_NICKNAMEINUSE(getNicknameIfNotSet(from->user), nickname);
+    return ERR_NICKNAMEINUSE(getNicknameIfNotSet(from), nickname);
   }
 
   if (!isNicknameValid(nickname)) {
-    return ERR_ERRONEUSNICKNAME(getNicknameIfNotSet(from->user), nickname);
+    return ERR_ERRONEUSNICKNAME(getNicknameIfNotSet(from), nickname);
   }
 
+  if (!from) {
+    User createdUser(nickname);
+    from = new Client<sockaddr_in>(createdUser, from_socket);
+    irc.addClient(from);
+  }
+
+  std::string previousNickname = from->user.nickname;
+  std::string previousIdentity = from->user.identity();
   from->user.nickname = nickname;
+
+  if (from->user.username.empty()) {
+    irc.broadcast(MSG_NICK(previousNickname, from->user.nickname));
+  } else {
+    irc.broadcast(MSG_NICK(previousIdentity, from->user.nickname));
+  }
 
   return "";
 }
