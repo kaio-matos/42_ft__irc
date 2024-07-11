@@ -59,7 +59,7 @@ std::string JOIN(std::vector<std::string> args,
       client->socket.write(ERR_BADCHANNELKEY(nick, channelName));
       continue;
     }
-    if (channel->getClients().size() >= channel->getUserLimit()) {
+    if (channel->getClients().size() >= (channel->getUserLimit() - 1)) {
       client->socket.write(ERR_CHANNELISFULL(nick, channelName));
       continue;
     }

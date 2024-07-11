@@ -135,11 +135,10 @@ std::string MODE(std::vector<std::string> args,
 
       if (action) {
         if (!hasOnlyDigits(modesParams[paramPosition].c_str()) ||
-            std::atoi(modesParams[paramPosition].c_str()) <= 0) {
+            std::atoi(modesParams[paramPosition].c_str()) <= 0)
           return (ERR_UNKNOWNMODE(nick, 'l'));
-          channelRef.setUserLimit(
-              action, std::atoi(modesParams[paramPosition++].c_str()));
-        }
+        channelRef.setUserLimit(
+            action, std::atoi(modesParams[paramPosition++].c_str()));
       } else
         channelRef.setUserLimit(action, 0);
 
