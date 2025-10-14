@@ -34,6 +34,8 @@ weechat
 # send some message
 ```
 
+You can see more Weechat commands here: <https://weechat.org/files/doc/weechat/stable/weechat_quickstart.en.html#start>
+
 ### Requirements
 
 - [x] port: The port number on which your IRC server will be listening to for incoming IRC connections.
