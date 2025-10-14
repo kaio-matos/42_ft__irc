@@ -16,7 +16,7 @@ docker compose exec server node ./testers/CreateClient.mjs john john
 PRIVMSG #games :Group chat message -> Hello Kaio!
 ```
 
-To test the compatibility with a official IRC chat you may download Weechat:
+To test the compatibility with an official IRC chat you may download Weechat:
 
 - Directly from their website <https://weechat.org/download/>
 - Or with some package manager like `pacman`
