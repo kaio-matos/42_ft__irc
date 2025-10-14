@@ -11,7 +11,7 @@ export async function CreateClient(nickname, username, timeout = true) {
     const c = net.createConnection(
       { localAddress: "0.0.0.0", port: 8080 },
       function onConnect() {
-        c.write(`PASS teste\r\n`, () => res(c));
+        c.write(`PASS secret\r\n`, () => res(c));
         c.write(`USER ${nickname} * 0 ${username}\r\n`, () => res(c));
       },
     );
